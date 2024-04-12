@@ -1,6 +1,7 @@
 
 import os
 from typing import Union
+import json
 
 def checkdir(dirs:Union[list,str]):
     """check if directories exist, if not, generate directories
@@ -23,3 +24,11 @@ def checkdir(dirs:Union[list,str]):
     for dir in dirs:
         if not os.path.exists(dir):
             os.makedirs(dir)
+
+def is_jsonable(x):
+    try:
+        json.dumps(x)
+        return True
+    except:
+        return False
+    
