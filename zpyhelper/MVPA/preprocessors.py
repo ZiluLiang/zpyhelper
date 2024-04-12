@@ -168,8 +168,8 @@ def normalise_multivariate_noise(activitypatternmatrix:numpy.ndarray,
     """
     assert activitypatternmatrix.shape[1] == residualmatrix.shape[1], "data matrix and residual matrix must have the same number of voxels"
 
-    ap_groups    = numpy.arange((activitypatternmatrix.shape[0],)) if ap_groups is None else ap_groups
-    resid_groups = numpy.arange((residualmatrix.shape[0],)) if resid_groups is None else resid_groups
+    ap_groups    = numpy.ones((activitypatternmatrix.shape[0],)) if ap_groups is None else ap_groups
+    resid_groups = numpy.ones((residualmatrix.shape[0],)) if resid_groups is None else resid_groups
     assert numpy.unique(ap_groups).size == numpy.unique(resid_groups).size 
     assert activitypatternmatrix.shape[0] == ap_groups.size
     assert residualmatrix.shape[0] == resid_groups.size
