@@ -88,9 +88,8 @@ def _estimate_whitening_from_resid(res) -> numpy.ndarray:
     """
     res = numpy.array(res)
     shrunk_cov,_ = _oas(res-res.mean(0)) 
-    precision_ = scipy.linalg.pinvh(shrunk_cov)
-    D, V = numpy.linalg.eigh(precision_)
-    preci_sqrt = (V * numpy.sqrt(D)) @ V.T 
+    D, V = numpy.linalg.eigh(shrunk_cov)
+    preci_sqrt = (V * (1/numpy.sqrt(D))) @ V.T 
     return preci_sqrt    
 
 def split_data(X:numpy.ndarray,groups=None,return_groups=False,**kwargs) -> Union[list,tuple]:
