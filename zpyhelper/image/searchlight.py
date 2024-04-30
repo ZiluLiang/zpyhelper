@@ -226,7 +226,7 @@ def _apply_mask_and_get_affinity(seeds,
     print(f'reading nii took: {t1-t0} seconds, neibourhood specification took: {time.time()-t1} seconds, redo iterations = {j},  max radius = {radius}')
     return Xs, A
 
-class RSASearchLight:
+class MVPASearchLight:
     def __init__(self,
                  patternimg_paths,
                  mask_img_path:str,

@@ -8,6 +8,8 @@ Zilu Liang @HIPlab Oxford
 from scipy.spatial.distance import pdist, squareform
 import numpy
 from typing import Union
+from sklearn.linear_model import LinearRegression
+from .preprocessors import scale_feature
 
 def check_array(x,ensure_dim:int=2,min_sample=1,min_feature=1) -> numpy.ndarray:
     """check if the dimensionality of array satisfies criteria
@@ -187,3 +189,61 @@ def compute_rdm_nomial(pattern_matrix:numpy.ndarray) -> numpy.ndarray:
     feature_rdms = [compute_rdm_identity(X_drop_na[:,k]) for k in range(X_drop_na.shape[1])]
     rdm = numpy.sqrt(numpy.sum(feature_rdms,axis=0))
     return rdm
+
+def compute_rdm_residual(rdm:numpy.ndarray,control_rdms:Union[list,numpy.ndarray],squareform=True):
+    """compute the residual of rdm after explaining for control rdms
+
+    Parameters
+    ----------
+    rdm : numpy.ndarray
+        the target rdm
+    control_rdms : list or numpy.ndarray
+        a control rdm or a list of control rdms
+    squareform : bool, optional
+        to put residual back to square form or not, by default True
+
+    Returns
+    -------
+    numpy.ndarray
+        the residual rdm, if ``squareform==True``, the shape will be the same as the original rdm, otherwise, the lower triangular part will be returned
+    """
+    # check rdm 
+    rdm = check_array(rdm,ensure_dim=2,min_sample=2,min_feature=2)
+    assert rdm.shape[0] == rdm.shape[1]
+    Y = lower_tri(rdm)[0]
+    
+    # check control rdm
+    if isinstance(control_rdms,list):
+        control_rdms = [check_array(m,ensure_dim=2,min_sample=2,min_feature=2) for m in control_rdms]
+    elif isinstance(control_rdms,numpy.ndarray):
+        control_rdms = [check_array(control_rdms,ensure_dim=2,min_sample=2,min_feature=2)]
+    else:
+        raise TypeError('control rdm must be numpy ndarray or a list of numpy ndarray')            
+
+    assert all([numpy.logical_and(m.shape[0]==rdm.shape[0],m.shape[1]==rdm.shape[1]) for m in control_rdms]), "control rdms must have the same size as rdm"
+
+    control_ = numpy.array([lower_tri(m)[0] for m in control_rdms])
+    # find out rows that are not nans in all columns
+    na_filters = numpy.all(
+        ~numpy.isnan(numpy.vstack([control_,Y])),0
+    )
+    
+    # standardize predictors and data
+    X = control_.T[na_filters,:]
+    #remove features with no variation
+    if sum([numpy.unique(arr).size>1 for arr in X.T])>0:
+        X = X[:,[numpy.unique(arr).size>1 for arr in X.T]]
+        zX = scale_feature(X,1,True)
+        zY = scale_feature(Y[na_filters],2,True)
+        control_reg = LinearRegression().fit(zX,zY)     
+        R = numpy.full_like(Y,fill_value=numpy.nan)
+        R[na_filters] = zY - control_reg.predict(zX)
+
+        if squareform:
+            resid_rdm = numpy.zeros_like(rdm)
+            resid_rdm[lower_tri(resid_rdm)[1]] = R
+            return resid_rdm + resid_rdm.T
+        else:
+            return R
+    else:
+        raise TypeError("control rdms have less than 2 unique values")

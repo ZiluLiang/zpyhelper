@@ -8,13 +8,10 @@ _type_
 """
 
 import numpy
-import scipy
-import itertools
 from sklearn.covariance._shrunk_covariance import _oas
 from sklearn.decomposition import PCA
 from typing import Union
 from functools import partial, reduce
-from .rdm import check_array
 
 def scale_feature(X:numpy.ndarray,s_dir:int=2,standardize:bool=True) -> numpy.ndarray:
     """ standardize or center a 1D or 2D numpy array by using ZX = (X - mean)/std
@@ -92,7 +89,7 @@ def _estimate_whitening_from_resid(res) -> numpy.ndarray:
     preci_sqrt = (V * (1/numpy.sqrt(D))) @ V.T 
     return preci_sqrt    
 
-def split_data(X:numpy.ndarray,groups=None,return_groups=False,**kwargs) -> Union[list,tuple]:
+def split_data(X:numpy.ndarray,groups=None,return_groups=False,select_groups:list=None,**kwargs) -> Union[list,tuple]:
     """split data into groups
 
     Parameters
@@ -103,6 +100,8 @@ def split_data(X:numpy.ndarray,groups=None,return_groups=False,**kwargs) -> Unio
         array specifying the which group each row of data belongs to, if `None`, all rows are assumed to be from the same group. by default None
     return_groups: bool, optional
         whether or not to return the group corresponding to the split
+    select_groups:list, optional
+        the (subset of) groups used to return. If `None`, will return the splits corresponding to all groups. If a list, will only return the splits corresponding to the specified groups
 
     Returns
     -------
@@ -115,10 +114,14 @@ def split_data(X:numpy.ndarray,groups=None,return_groups=False,**kwargs) -> Unio
     groups = numpy.ones((X.shape[0],)) if groups is None else numpy.atleast_1d(groups)
     assert groups.size==X.shape[0], "number of samples in X and groups does not match"
     unique_groups = numpy.unique(groups)
+    
+    select_groups = unique_groups if select_groups is None else select_groups
+    assert all([g in unique_groups for g in select_groups]), "some of the specified groups do not exist!"
+
     if return_groups:
-        return [X[groups.flatten()==j,:] for j in numpy.unique(groups)], unique_groups
+        return [X[groups.flatten()==j,:] for j in select_groups], select_groups
     else:
-        return [X[groups.flatten()==j,:] for j in numpy.unique(groups)]   
+        return [X[groups.flatten()==j,:] for j in select_groups]   
 
 def concat_data(Xlist:list)->numpy.ndarray:
     """concatenate list of data array into one array
@@ -222,6 +225,31 @@ def average_odd_even_session(activitypatternmatrix:numpy.ndarray,session:numpy.n
     X_odd   = numpy.mean(X_list[0::2],axis=0)
     X_even  = numpy.mean(X_list[1::2],axis=0) if len(X_list)>1 else []
     return concat_data([X_odd,X_even])
+
+def average_flexi_session(activitypatternmatrix:numpy.ndarray,session:numpy.ndarray,average_by:list) -> numpy.ndarray:
+    """average data in by flexible session separately
+
+    Parameters
+    ----------
+    activitypatternmatrix : numpy.ndarray
+        data matrix of shape `(nsample,nvoxel)`
+    session : numpy.ndarray
+        array specifying the which session each row of data belongs to.
+    average_by : list
+        list specifying groups of sessions that will be averaged across. \n
+        For example, `average_by = [[0,1],[2,3]]` will return the average activity pattern of session 0 and 1, and the average activity pattern of session 2 and 3
+
+    Returns
+    -------
+    numpy.ndarray
+        transformed data matrix
+    """
+    assert activitypatternmatrix.shape[0] == session.size
+    X_list,unique_sess  = split_data(activitypatternmatrix,session,return_groups=True)
+    unique_sess = list(unique_sess)
+    assert all([s in unique_sess for s in sum(average_by,[])]), "some of the specified session do not exist!"
+    X_aves = [numpy.mean([X_list[unique_sess.index(s)] for s in ss],axis=0) for ss in average_by]
+    return concat_data(X_aves)
 
 
 def chain_steps(*varargin):
