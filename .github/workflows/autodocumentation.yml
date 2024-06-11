@@ -2,7 +2,7 @@ name: autodocumentation from sphinx
 
 on:
   push:
-    branches: [master] # branch to trigger deployment
+    branches: [main] # branch to trigger deployment
 
 jobs:
   pages:
