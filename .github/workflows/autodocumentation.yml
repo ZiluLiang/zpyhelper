@@ -10,10 +10,10 @@ jobs:
     permissions:
       contents: write
     steps:
-    - uses: actions/checkout@v4
     - name: Install dependencies
       run: |
         pip install sphinx sphinx_rtd_theme myst_parser sphinxcontrib-apidoc numpydoc
+    - uses: actions/checkout@v4
     - name: Build HTML
       uses: ammaraskar/sphinx-action@master
     - name: Upload artifacts
