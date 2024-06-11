@@ -1,4 +1,6 @@
 *.egg-info
 build
 dist
+.vscode
+test
 */**/__pycache__

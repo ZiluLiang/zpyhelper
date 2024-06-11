@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>zpyhelper.MVPA.preprocessors &#8212; zpyhelper  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="zpyhelper.MVPA.rdm" href="zpyhelper.MVPA.rdm.html" />
+    <link rel="prev" title="zpyhelper.MVPA.estimators" href="zpyhelper.MVPA.estimators.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-zpyhelper.MVPA.preprocessors">
+<span id="zpyhelper-mvpa-preprocessors"></span><h1>zpyhelper.MVPA.preprocessors<a class="headerlink" href="#module-zpyhelper.MVPA.preprocessors" title="Link to this heading">¶</a></h1>
+<p>Methods for preprocessing activity pattern matrix</p>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/zpyhelper.MVPA.preprocessors.html#zpyhelper.MVPA.preprocessors.average_flexi_session" title="zpyhelper.MVPA.preprocessors.average_flexi_session"><code class="xref py py-obj docutils literal notranslate"><span class="pre">average_flexi_session</span></code></a>(activitypatternmatrix, ...)</p></td>
+<td><p>average data in by flexible session separately</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/zpyhelper.MVPA.preprocessors.html#zpyhelper.MVPA.preprocessors.average_odd_even_session" title="zpyhelper.MVPA.preprocessors.average_odd_even_session"><code class="xref py py-obj docutils literal notranslate"><span class="pre">average_odd_even_session</span></code></a>(...)</p></td>
+<td><p>average data in odd and even session separately</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/zpyhelper.MVPA.preprocessors.html#zpyhelper.MVPA.preprocessors.chain_steps" title="zpyhelper.MVPA.preprocessors.chain_steps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">chain_steps</span></code></a>(*varargin)</p></td>
+<td><p>Chaining different preprocessing functions together and compose it into one preprocessing function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/zpyhelper.MVPA.preprocessors.html#zpyhelper.MVPA.preprocessors.concat_data" title="zpyhelper.MVPA.preprocessors.concat_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">concat_data</span></code></a>(Xlist)</p></td>
+<td><p>concatenate list of data array into one array</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/zpyhelper.MVPA.preprocessors.html#zpyhelper.MVPA.preprocessors.extract_pc" title="zpyhelper.MVPA.preprocessors.extract_pc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extract_pc</span></code></a>(activitypatternmatrix[, n_components])</p></td>
+<td><p>Perform PCA and transform the data accordingly</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/zpyhelper.MVPA.preprocessors.html#zpyhelper.MVPA.preprocessors.normalise_multivariate_noise" title="zpyhelper.MVPA.preprocessors.normalise_multivariate_noise"><code class="xref py py-obj docutils literal notranslate"><span class="pre">normalise_multivariate_noise</span></code></a>(...[, ...])</p></td>
+<td><p>perform multivariate noise normalisation on the activity pattern matrix.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../api/zpyhelper.MVPA.preprocessors.html#zpyhelper.MVPA.preprocessors.scale_feature" title="zpyhelper.MVPA.preprocessors.scale_feature"><code class="xref py py-obj docutils literal notranslate"><span class="pre">scale_feature</span></code></a>(X[, s_dir, standardize])</p></td>
+<td><p>standardize or center a 1D or 2D numpy array by using ZX = (X - mean)/std</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../api/zpyhelper.MVPA.preprocessors.html#zpyhelper.MVPA.preprocessors.split_data" title="zpyhelper.MVPA.preprocessors.split_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split_data</span></code></a>(X[, groups, return_groups, ...])</p></td>
+<td><p>split data into groups</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">zpyhelper</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="zpyhelper.html">zpyhelper</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="zpyhelper.MVPA.html">zpyhelper.MVPA</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="zpyhelper.MVPA.estimators.html">zpyhelper.MVPA.estimators</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">zpyhelper.MVPA.preprocessors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="zpyhelper.MVPA.rdm.html">zpyhelper.MVPA.rdm</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="zpyhelper.filesys.html">zpyhelper.filesys</a></li>
+<li class="toctree-l2"><a class="reference internal" href="zpyhelper.image.html">zpyhelper.image</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="zpyhelper.html">zpyhelper</a><ul>
+  <li><a href="zpyhelper.MVPA.html">zpyhelper.MVPA</a><ul>
+      <li>Previous: <a href="zpyhelper.MVPA.estimators.html" title="previous chapter">zpyhelper.MVPA.estimators</a></li>
+      <li>Next: <a href="zpyhelper.MVPA.rdm.html" title="next chapter">zpyhelper.MVPA.rdm</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Zilu Liang.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="../_sources/_autosummary/zpyhelper.MVPA.preprocessors.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

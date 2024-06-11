@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>zpyhelper.MVPA.estimators &#8212; zpyhelper  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=12dfc556" />
+    <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for zpyhelper.MVPA.estimators</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot; Estimator classes for MVPA analysis</span>
+<span class="sd">    All classes takes activity pattern matrix as an input and performs different types of RSA analysis based on the activity pattern matrix.  \n</span>
+<span class="sd">    An estimator class has at least three methods:  \n</span>
+<span class="sd">    (1) fit: by calling estimator.fit(), analysis is performed, `result` attribute of the estimator will be set, it will be an 1D numpy array.  \n</span>
+<span class="sd">    (2) __str__: return the name of estimator class  \n</span>
+<span class="sd">    (3) get_details: return the details of estimator class in a dictonary, data will be serialized so that it can be written into JSON    \n</span>
+<span class="sd">    Some estimator also comes with a plotting method:  \n</span>
+<span class="sd">    (4) visualize: by calling estimator.visualize(), the result of RSA analysis will visualized, a figure handle will be returned  \n</span>
+<span class="sd">  </span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">abc</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">scipy</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span><span class="p">,</span> <span class="n">LogisticRegression</span>
+<span class="kn">from</span> <span class="nn">sklearn.multioutput</span> <span class="kn">import</span> <span class="n">MultiOutputRegressor</span><span class="p">,</span><span class="n">MultiOutputClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">LeaveOneGroupOut</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span><span class="p">,</span><span class="n">r2_score</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">svm</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+
+<span class="kn">from</span> <span class="nn">.rdm</span> <span class="kn">import</span> <span class="n">lower_tri</span><span class="p">,</span> <span class="n">compute_rdm</span><span class="p">,</span> <span class="n">compute_rdm_residual</span>
+<span class="kn">from</span> <span class="nn">.preprocessors</span> <span class="kn">import</span> <span class="n">split_data</span><span class="p">,</span> <span class="n">scale_feature</span>
+
+<div class="viewcode-block" id="_force_1d">
+<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.estimators.html#zpyhelper.MVPA.estimators._force_1d">[docs]</a>
+<span class="k">def</span> <span class="nf">_force_1d</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;force array to be 1D&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="MetaEstimator">
+<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.estimators.html#zpyhelper.MVPA.estimators.MetaEstimator">[docs]</a>
+<span class="k">class</span> <span class="nc">MetaEstimator</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Meta class for estimators</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="MetaEstimator.fit">
+<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.estimators.html#zpyhelper.MVPA.estimators.MetaEstimator.fit">[docs]</a>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run estimator.   </span>
+<span class="sd">         After self.fit() is called, `result` attribute of the estimator will be set, it will be an 1D numpy array.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="MetaEstimator.__str__">
+<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.estimators.html#zpyhelper.MVPA.estimators.MetaEstimator.__str__">[docs]</a>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the name of estimator class  </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="MetaEstimator.get_details">
+<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.estimators.html#zpyhelper.MVPA.estimators.MetaEstimator.get_details">[docs]</a>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_details</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the details of estimator class in a dictonary, data will be serialized so that it can be written into JSON</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+</div>
+
+
+<div class="viewcode-block" id="PatternCorrelation">
+<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.estimators.html#zpyhelper.MVPA.estimators.PatternCorrelation">[docs]</a>
+<span class="k">class</span> <span class="nc">PatternCorrelation</span><span class="p">(</span><span class="n">MetaEstimator</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate the correlation between neural rdm and model rdm</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    activitypattern : numpy.ndarray</span>
+<span class="sd">        a 2D numpy array. the neural activity pattern matrix used for computing representation dissimilarity matrix. size = (nsample,nfeatures)</span>
+<span class="sd">    modelrdm : numpy.ndarray or list of numpy.ndarray</span>
+<span class="sd">        a 2D numpy array. the dissimilarity matrices from different models of representation. size = (nsample,nsample)</span>
+<span class="sd">    modelnames: list</span>
+<span class="sd">        a list of model names. If `None` models will be named as `m1,m2,...`, by default `None`</span>
+<span class="sd">    rdm_metric: str, optional</span>
+<span class="sd">        dissimilarity/distance metric passed to `scipy.spatial.distance.pdist` to compute neural rdm from activity pattern matrix, by default `&quot;correlation&quot;`</span>
+<span class="sd">    type : str, optional</span>
+<span class="sd">        type of correlation measure, by default `&quot;spearman&quot;`.</span>
+<span class="sd">        must be one of: `&quot;spearman&quot;, &quot;pearson&quot;, &quot;kendall&quot;, &quot;linreg&quot;`</span>
+<span class="sd">    ztransform: bool, optional</span>
+<span class="sd">        whether or not to perform fisher Z transform to the correlation coefficients, by default `False`.    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">activitypattern</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                 <span class="n">modelrdms</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="nb">list</span><span class="p">],</span>
+                 <span class="n">modelnames</span><span class="p">:</span><span class="nb">list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">rdm_metric</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;correlation&quot;</span><span class="p">,</span>
+                 <span class="nb">type</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;spearman&quot;</span><span class="p">,</span>
+                 <span class="n">ztransform</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">runonresidual</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">controlrdms</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="nb">list</span><span class="p">]</span><span class="o">=</span><span class="p">[])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>        
+
+        <span class="c1">#neural rdm</span>
+        <span class="n">neuralrdm</span> <span class="o">=</span> <span class="n">compute_rdm</span><span class="p">(</span><span class="n">activitypattern</span><span class="p">,</span><span class="n">rdm_metric</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rdm_shape</span> <span class="o">=</span> <span class="n">neuralrdm</span><span class="o">.</span><span class="n">shape</span>        
+        <span class="c1"># if run on residual, compute the residual after regressing out control rdm</span>
+        <span class="k">if</span> <span class="n">runonresidual</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Y</span> <span class="o">=</span> <span class="n">compute_rdm_residual</span><span class="p">(</span><span class="n">neuralrdm</span><span class="p">,</span><span class="n">controlrdms</span><span class="p">,</span><span class="n">squareform</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">lower_tri</span><span class="p">(</span><span class="n">neuralrdm</span><span class="p">)</span>
+
+        <span class="c1">#model rdm and names        </span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">modelrdms</span><span class="p">,</span><span class="nb">list</span><span class="p">):</span>
+            <span class="n">modelrdms</span> <span class="o">=</span> <span class="n">modelrdms</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">modelrdms</span><span class="p">,</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">modelrdms</span> <span class="o">=</span> <span class="p">[</span><span class="n">modelrdms</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;model rdm must be numpy ndarray or a list of numpy ndarray&#39;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">modelnames</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">modelnames</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;m</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">modelrdms</span><span class="p">))]</span>            
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">modelnames</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">modelrdms</span><span class="p">),</span> <span class="s1">&#39;number of model names must be equal to number of model rdms&#39;</span>   
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">Xs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">modelrdms</span><span class="p">:</span>
+            <span class="n">X</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">lower_tri</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Xs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modelnames</span> <span class="o">=</span> <span class="n">modelnames</span>  
+        <span class="bp">self</span><span class="o">.</span><span class="n">nX</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">modelrdms</span><span class="p">)</span>
+
+        <span class="c1">#correlation type</span>
+        <span class="n">corr_functions</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;spearman&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">:</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">spearmanr</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span><span class="o">.</span><span class="n">correlation</span><span class="p">,</span>
+            <span class="s2">&quot;pearson&quot;</span><span class="p">:</span>  <span class="k">lambda</span> <span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">:</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span><span class="o">.</span><span class="n">correlation</span><span class="p">,</span>
+            <span class="s2">&quot;kendall&quot;</span><span class="p">:</span>  <span class="k">lambda</span> <span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">:</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">kendalltau</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span><span class="o">.</span><span class="n">statistic</span><span class="p">,</span>
+            <span class="s2">&quot;linreg&quot;</span><span class="p">:</span>   <span class="k">lambda</span> <span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">:</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">linregress</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span><span class="o">.</span><span class="n">slope</span>
+        <span class="p">}</span>    
+        <span class="k">if</span> <span class="nb">type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">corr_functions</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unsupported type of correlation, must be one of: &#39;</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">corr_functions</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">type</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">corrfun</span> <span class="o">=</span> <span class="n">corr_functions</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">ztransform</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outputtransform</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arctanh</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outputtransform</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span>
+    
+<div class="viewcode-block" id="PatternCorrelation.fit">
+<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.estimators.html#zpyhelper.MVPA.estimators.PatternCorrelation.fit">[docs]</a>
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run estimator.   </span>
+<span class="sd">         After self.fit() is called, `result` attribute of the estimator will be set, it will be an 1D numpy array.</span>
+
+<span class="sd">         Note that pairwise exclusion is used. For each model, the lower triangular part of the model rdm and that of neural rdm are put into two columns. </span>
+<span class="sd">         If one of the two columns contains a NaN , the corresponding row is omitted. This process is done separately for each model rdm when calculating correlation between that particular model rdm and neural rdm</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">na_filters</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">X</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">Xs</span><span class="p">:</span>
+            <span class="n">na_filters</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="o">~</span><span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">),</span><span class="o">~</span><span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">na_filters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">na_filters</span><span class="p">)</span>
+            <span class="n">Y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">[</span><span class="n">na_filters</span><span class="p">]</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">na_filters</span><span class="p">]</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputtransform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">corrfun</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">))</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="n">_force_1d</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+    
+<div class="viewcode-block" id="PatternCorrelation.visualize">
+<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.estimators.html#zpyhelper.MVPA.estimators.PatternCorrelation.visualize">[docs]</a>
+    <span class="k">def</span> <span class="nf">visualize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;show the model rdm(s) and neural rdm in heatmap.</span>
+
+<span class="sd">        Each subplot shows a model or neural rdm. The correlation between neural and model rdm is shown in subplot&#39;s title.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        matplotlib.figure.Figure</span>
+<span class="sd">            the handle of plotted figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">result</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>        
+
+        <span class="n">fig</span><span class="p">,</span><span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nX</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">nX</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">X</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Xs</span><span class="p">):</span>
+            <span class="n">plot_models</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span><span class="n">X</span><span class="p">]</span>
+            <span class="n">plot_titles</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;neural rdm </span><span class="se">\n</span><span class="s2"> r(neural,model)=</span><span class="si">{</span><span class="s1">&#39;</span><span class="si">%.3f</span><span class="s1">&#39;</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">modelnames</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,(</span><span class="n">t</span><span class="p">,</span><span class="n">m</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">plot_titles</span><span class="p">,</span><span class="n">plot_models</span><span class="p">)):</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rdm_shape</span><span class="p">,</span><span class="n">numpy</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+                <span class="n">_</span><span class="p">,</span><span class="n">idx</span> <span class="o">=</span> <span class="n">lower_tri</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                <span class="n">fillidx</span> <span class="o">=</span> <span class="p">(</span><span class="n">idx</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">na_filters</span><span class="p">[</span><span class="n">k</span><span class="p">]],</span><span class="n">idx</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">na_filters</span><span class="p">[</span><span class="n">k</span><span class="p">]])</span>
+                <span class="n">v</span><span class="p">[</span><span class="n">fillidx</span><span class="p">]</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">na_filters</span><span class="p">[</span><span class="n">k</span><span class="p">]]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nX</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="n">j</span><span class="p">],</span><span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">cbar_kws</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;shrink&quot;</span><span class="p">:</span><span class="mf">0.85</span><span class="p">})</span>
+                    <span class="n">axes</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">j</span><span class="p">],</span><span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">cbar_kws</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;shrink&quot;</span><span class="p">:</span><span class="mf">0.85</span><span class="p">})</span>
+                    <span class="n">axes</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s1"> correlation:&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span></div>
+
+    
+<div class="viewcode-block" id="PatternCorrelation.__str__">
+<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.estimators.html#zpyhelper.MVPA.estimators.PatternCorrelation.__str__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the name of estimator class  </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;PatternCorrelation with </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+    
+<div class="viewcode-block" id="PatternCorrelation.get_details">
+<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.estimators.html#zpyhelper.MVPA.estimators.PatternCorrelation.get_details">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_details</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>        
+        <span class="n">details</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">(),</span>
+                   <span class="s2">&quot;corrtype&quot;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                   <span class="s2">&quot;NAfilters&quot;</span><span class="p">:</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modelnames</span><span class="p">,[</span><span class="n">x</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">na_filters</span><span class="p">])),</span>
+                   <span class="s2">&quot;modelRDMs&quot;</span><span class="p">:</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modelnames</span><span class="p">,[</span><span class="n">x</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">Xs</span><span class="p">]))</span>
+                  <span class="p">}</span>
+        <span class="k">return</span>  <span class="n">details</span></div>
+</div>
+
+
+<div class="viewcode-block" id="MultipleRDMRegression">
+<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.estimators.html#zpyhelper.MVPA.estimators.MultipleRDMRegression">[docs]</a>
+<span class="k">class</span> <span class="nc">MultipleRDMRegression</span><span class="p">(</span><span class="n">MetaEstimator</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;estimate the regression coefficient when using the model rdms to predict neural rdm</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    activitypattern : numpy.ndarray</span>
+<span class="sd">        a 2D numpy array. the neural activity pattern matrix used for computing representation dissimilarity matrix. size = (nsample,nfeatures)</span>
+<span class="sd">    modelrdms : numpy.ndarray or list of numpy.ndarray</span>
+<span class="sd">        a 2D numpy array. the dissimilarity matrices from different models of representation. size = (nsample,nsample)</span>
+<span class="sd">    modelnames: list, optional</span>
+<span class="sd">        a list of model names. If `None` models will be named as m1,m2,..., by default `None`</span>
+<span class="sd">    rdm_metric: str, optional</span>
+<span class="sd">        dissimilarity/distance metric passed to `scipy.spatial.distance.pdist` to compute neural rdm from activity pattern matrix, by default `&quot;correlation&quot;`</span>
+<span class="sd">    standardize: bool, optional</span>
+<span class="sd">        whether or not to standardize the model rdms and neural rdms before running regression, by default `True`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">activitypattern</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                 <span class="n">modelrdms</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="nb">list</span><span class="p">],</span><span class="n">modelnames</span><span class="p">:</span><span class="nb">list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">rdm_metric</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;correlation&quot;</span><span class="p">,</span><span class="n">standardize</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">runonresidual</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">controlrdms</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="nb">list</span><span class="p">]</span><span class="o">=</span><span class="p">[])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="c1">#model rdm and names        </span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">modelrdms</span><span class="p">,</span><span class="nb">list</span><span class="p">):</span>
+            <span class="n">modelrdms</span> <span class="o">=</span> <span class="n">modelrdms</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">modelrdms</span><span class="p">,</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">modelrdms</span> <span class="o">=</span> <span class="p">[</span><span class="n">modelrdms</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;model rdm must be numpy ndarray or a list of numpy ndarray&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">modelnames</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">modelnames</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;m</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">modelrdms</span><span class="p">))]</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">modelnames</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">modelrdms</span><span class="p">),</span> <span class="s1">&#39;number of model names must be equal to number of model rdms&#39;</span>
+
+        <span class="c1">#neural rdm</span>
+        <span class="n">neuralrdm</span> <span class="o">=</span> <span class="n">compute_rdm</span><span class="p">(</span><span class="n">activitypattern</span><span class="p">,</span><span class="n">rdm_metric</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rdm_shape</span> <span class="o">=</span> <span class="n">neuralrdm</span><span class="o">.</span><span class="n">shape</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modelnames</span> <span class="o">=</span> <span class="n">modelnames</span>
+
+        <span class="c1"># if run on residual, compute the residual after regressing out control rdm</span>
+        <span class="k">if</span> <span class="n">runonresidual</span><span class="p">:</span>
+            <span class="n">Y</span> <span class="o">=</span> <span class="n">compute_rdm_residual</span><span class="p">(</span><span class="n">neuralrdm</span><span class="p">,</span><span class="n">controlrdms</span><span class="p">,</span><span class="n">squareform</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">Y</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">lower_tri</span><span class="p">(</span><span class="n">neuralrdm</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_reg</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">modelrdms</span><span class="p">)</span> <span class="c1"># number of model rdms</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">Y</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">n_reg</span><span class="p">))</span> <span class="c1"># X is a npair * nmodel matrix</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span><span class="n">m</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">modelrdms</span><span class="p">):</span>
+            <span class="n">X</span><span class="p">[:,</span><span class="n">j</span><span class="p">],</span><span class="n">_</span> <span class="o">=</span> <span class="n">lower_tri</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">X</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Y</span> <span class="o">=</span> <span class="n">Y</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">standardize</span> <span class="o">=</span> <span class="n">standardize</span>
+    
+<div class="viewcode-block" id="MultipleRDMRegression.fit">
+<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.estimators.html#zpyhelper.MVPA.estimators.MultipleRDMRegression.fit">[docs]</a>
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run estimator.   </span>
+<span class="sd">         After self.fit() is called, `result` attribute of the estimator will be set, it will be an 1D numpy array.</span>
+
+<span class="sd">         Note that list-wise exclusion is used. The lower triangular part of the model rdm(s) and that of neural rdm are put into columns. </span>
+<span class="sd">         If any one of the columns contains a NaN , the corresponding row is omitted.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">xna_filters</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="o">~</span><span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">),</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># find out rows that are not nans in all columns</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">na_filters</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="o">~</span><span class="n">numpy</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">),</span><span class="n">xna_filters</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">standardize</span><span class="p">:</span>
+            <span class="c1">#standardize design matrix independently within each column</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">scale_feature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">na_filters</span><span class="p">,:],</span><span class="mi">1</span><span class="p">)</span>
+            <span class="c1"># standardize Y</span>
+            <span class="n">Y</span> <span class="o">=</span> <span class="n">scale_feature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">na_filters</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">na_filters</span><span class="p">,:]</span>
+            <span class="n">Y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">na_filters</span><span class="p">]</span>
+
+        <span class="n">reg</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">()</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reg</span> <span class="o">=</span> <span class="n">reg</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="n">_force_1d</span><span class="p">(</span><span class="n">reg</span><span class="o">.</span><span class="n">coef_</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">score</span>  <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+    
+<div class="viewcode-block" id="MultipleRDMRegression.visualize">
+<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.estimators.html#zpyhelper.MVPA.estimators.MultipleRDMRegression.visualize">[docs]</a>
+    <span class="k">def</span> <span class="nf">visualize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;show the model rdm(s) and neural rdm in heatmap.</span>
+
+<span class="sd">        Each subplot shows a model or neural rdm. The regression coefficient of model rdm is shown in subplot&#39;s title.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        matplotlib.figure.Figure</span>
+<span class="sd">            the handle of plotted figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">result</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+        <span class="n">plot_models</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">numpy</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">),</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+        <span class="n">plot_titles</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;neural rdm&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">modelnames</span>
+
+        <span class="n">fig</span><span class="p">,</span><span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">plot_models</span><span class="p">),</span><span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,(</span><span class="n">t</span><span class="p">,</span><span class="n">m</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">plot_titles</span><span class="p">,</span><span class="n">plot_models</span><span class="p">)):</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rdm_shape</span><span class="p">,</span><span class="n">numpy</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+            <span class="n">_</span><span class="p">,</span><span class="n">idx</span> <span class="o">=</span> <span class="n">lower_tri</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+            <span class="n">fillidx</span> <span class="o">=</span> <span class="p">(</span><span class="n">idx</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">na_filters</span><span class="p">],</span><span class="n">idx</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="bp">self</span><span class="o">.</span><span class="n">na_filters</span><span class="p">])</span>
+            <span class="n">v</span><span class="p">[</span><span class="n">fillidx</span><span class="p">]</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">na_filters</span><span class="p">]</span>
+            <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="n">j</span><span class="p">],</span><span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">cbar_kws</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;shrink&quot;</span><span class="p">:</span><span class="mf">0.85</span><span class="p">})</span>
+            <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="p">[</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;R2: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="MultipleRDMRegression.__str__">
+<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.estimators.html#zpyhelper.MVPA.estimators.MultipleRDMRegression.__str__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the name of estimator class  </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;MultipleRDMRegression&quot;</span></div>
+
+    
+<div class="viewcode-block" id="MultipleRDMRegression.get_details">
+<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.estimators.html#zpyhelper.MVPA.estimators.MultipleRDMRegression.get_details">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_details</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the details of estimator class in a dictonary, data will be serialized so that it can be written into JSON</span>
+<span class="sd">        &quot;&quot;&quot;</span>      
+        <span class="n">details</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">(),</span>
+                   <span class="s2">&quot;standardize&quot;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">standardize</span><span class="o">*</span><span class="mi">1</span><span class="p">,</span>
+                   <span class="s2">&quot;NAfilters&quot;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">na_filters</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+                   <span class="s2">&quot;modelRDMs&quot;</span><span class="p">:</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modelnames</span><span class="p">,[</span><span class="n">x</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">])),</span>
+                   <span class="s2">&quot;score&quot;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">score</span>
+                  <span class="p">}</span>
+        <span class="k">return</span>  <span class="n">details</span></div>
+</div>
+
+
+<div class="viewcode-block" id="NeuralRDMStability">
+<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.estimators.html#zpyhelper.MVPA.estimators.NeuralRDMStability">[docs]</a>
+<span class="k">class</span> <span class="nc">NeuralRDMStability</span><span class="p">(</span><span class="n">MetaEstimator</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;calculate the stability of neural RDM across different splits of data</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    activitypattern : numpy.ndarray</span>
+<span class="sd">        a 2D numpy array. the neural activity pattern matrix used for computing representation dissimilarity matrix. size = (nsample,nfeatures)</span>
+<span class="sd">    groups : numpy.ndarray</span>
+<span class="sd">        array specifying the which group each row of activitypattern belongs to. Must have at least two unique values.</span>
+<span class="sd">    rdm_metric : str, optional</span>
+<span class="sd">        _dissimilarity/distance metric passed to `scipy.spatial.distance.pdist` to compute neural rdm from activity pattern matrix, by default `&quot;correlation&quot;`</span>
+<span class="sd">    type : str, optional</span>
+<span class="sd">        type of correlation measure, by default `&quot;spearman&quot;`.</span>
+<span class="sd">        must be one of: `&quot;spearman&quot;, &quot;pearson&quot;, &quot;kendall&quot;, &quot;linreg&quot;`</span>
+<span class="sd">    ztransform: bool, optional</span>
+<span class="sd">        whether or not to perform fisher Z transform to the correlation coefficients, by default `False`.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        ``groups`` must have at least two unique values</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">activitypattern</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">groups</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                 <span class="n">rdm_metric</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;correlation&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;spearman&quot;</span><span class="p">,</span><span class="n">ztransform</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">numpy</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="o">&gt;</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Xs</span> <span class="o">=</span> <span class="n">split_data</span><span class="p">(</span><span class="n">activitypattern</span><span class="p">,</span><span class="n">groups</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">RDMs</span> <span class="o">=</span> <span class="p">[</span><span class="n">compute_rdm</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">rdm_metric</span><span class="p">)</span> <span class="k">for</span> <span class="n">X</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">Xs</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span>
+        
+        <span class="c1">#correlation type</span>
+        <span class="n">corr_functions</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;spearman&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">:</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">spearmanr</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span><span class="o">.</span><span class="n">correlation</span><span class="p">,</span>
+            <span class="s2">&quot;pearson&quot;</span><span class="p">:</span>  <span class="k">lambda</span> <span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">:</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span><span class="o">.</span><span class="n">correlation</span><span class="p">,</span>
+            <span class="s2">&quot;kendall&quot;</span><span class="p">:</span>  <span class="k">lambda</span> <span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">:</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">kendalltau</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span><span class="o">.</span><span class="n">statistic</span><span class="p">,</span>
+            <span class="s2">&quot;linreg&quot;</span><span class="p">:</span>   <span class="k">lambda</span> <span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">:</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">linregress</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">)</span><span class="o">.</span><span class="n">slope</span>
+        <span class="p">}</span>    
+        <span class="k">if</span> <span class="nb">type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">corr_functions</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unsupported type of correlation, must be one of: &#39;</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">corr_functions</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="nb">type</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">corrfun</span> <span class="o">=</span> <span class="n">corr_functions</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">ztransform</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outputtransform</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arctanh</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outputtransform</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span>
+
+<div class="viewcode-block" id="NeuralRDMStability.fit">
+<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.estimators.html#zpyhelper.MVPA.estimators.NeuralRDMStability.fit">[docs]</a>
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run estimator.   </span>
+<span class="sd">         After self.fit() is called, `result` attribute of the estimator will be set, it will be an 1D numpy array.</span>
+
+<span class="sd">         Neural RDM is calculated for each group. Correlation between every possible pair of groups are calculated. Then the average is taken over all the calculated correlation coefficients.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">rdm1</span><span class="p">,</span><span class="n">rdm2</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">RDMs</span><span class="p">,</span><span class="mi">2</span><span class="p">):</span>
+            <span class="n">X</span><span class="p">,</span><span class="n">Y</span> <span class="o">=</span> <span class="n">lower_tri</span><span class="p">(</span><span class="n">rdm1</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span><span class="n">lower_tri</span><span class="p">(</span><span class="n">rdm2</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputtransform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">corrfun</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">))</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stability_perpair</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">),</span><span class="mi">2</span><span class="p">)],</span><span class="n">result</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="n">_force_1d</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+    
+<div class="viewcode-block" id="NeuralRDMStability.__str__">
+<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.estimators.html#zpyhelper.MVPA.estimators.NeuralRDMStability.__str__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the name of estimator class  </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;NeuralRDMStability&quot;</span></div>
+
+    
+<div class="viewcode-block" id="NeuralRDMStability.visualize">
+<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.estimators.html#zpyhelper.MVPA.estimators.NeuralRDMStability.visualize">[docs]</a>
+    <span class="k">def</span> <span class="nf">visualize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;show the neural rdm of different groups using heatmap.</span>
+
+<span class="sd">        Each subplot shows the neural rdm of one group.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        matplotlib.figure.Figure</span>
+<span class="sd">            the handle of plotted figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fig</span><span class="p">,</span><span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">RDMs</span><span class="p">),</span><span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,(</span><span class="n">g</span><span class="p">,</span><span class="n">m</span><span class="p">,</span><span class="n">ax</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">RDMs</span><span class="p">,</span><span class="n">axes</span><span class="p">)):</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">fill_value</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+            <span class="n">v</span><span class="p">[</span><span class="n">lower_tri</span><span class="p">(</span><span class="n">m</span><span class="p">)[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">lower_tri</span><span class="p">(</span><span class="n">m</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">v</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span><span class="n">square</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">cbar_kws</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;shrink&quot;</span><span class="p">:</span><span class="mf">0.85</span><span class="p">})</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;rdm of data split </span><span class="si">{</span><span class="n">g</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;average stability: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span></div>
+
+    
+<div class="viewcode-block" id="NeuralRDMStability.get_details">
+<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.estimators.html#zpyhelper.MVPA.estimators.NeuralRDMStability.get_details">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_details</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the details of estimator class in a dictonary, data will be serialized so that it can be written into JSON</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">details</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">(),</span>
+                   <span class="s2">&quot;corrtype&quot;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span>
+                  <span class="p">}</span>
+        <span class="k">return</span>  <span class="n">details</span></div>
+</div>
+
+
+<div class="viewcode-block" id="PatternDecoding">
+<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.estimators.html#zpyhelper.MVPA.estimators.PatternDecoding">[docs]</a>
+<span class="k">class</span> <span class="nc">PatternDecoding</span><span class="p">(</span><span class="n">MetaEstimator</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;decode from neural activity pattern with cross validation   </span>
+<span class="sd">    Important note: this hasn&#39;t been tested in whole-brain searchlight yet</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    activitypattern : numpy.ndarray</span>
+<span class="sd">        a 2D numpy array of size `(nsample,nfeature)`. the neural activity pattern matrix used for decoding.</span>
+<span class="sd">    targets : numpy.ndarray </span>
+<span class="sd">        a 2D or 1D numpy array of size `(nsample,ntarget)` or `(nsample,)`.  Target values for prediction (class labels in classification, real numbers in regression).</span>
+<span class="sd">    groups : numpy.ndarray</span>
+<span class="sd">        a 1D numpy array of size `(nsample,)`. Group values used for splitting data into decoder fitting and evaluation set. Must have at least two unique values</span>
+<span class="sd">    decoder: str or an estimator object implementing decoding analysis with `fit` and `predict`</span>
+<span class="sd">        decoder used to perform the analysis</span>
+<span class="sd">    decoder_kwarg: dict </span>
+<span class="sd">        arguments passed to decoder class to instantiate a decoder</span>
+<span class="sd">    regression: bool</span>
+<span class="sd">        regression or classification decoder. If ``True``, will find in regression decoders, if ``False``, will find in classification decoders. by default ``False``.</span>
+<span class="sd">    targetnames: list, optional</span>
+<span class="sd">        a list of model names. If `None` models will be named as m1,m2,..., by default `None`</span>
+<span class="sd">    scoring_func: str or callable, optional</span>
+<span class="sd">        a scoring function that will be used to compute the quality of prediction after fitting the decoder. If None, will use accuracy score for classification and use r_square for regression.</span>
+<span class="sd">    scoring_funcname: str, optional</span>
+<span class="sd">        name of the scoring function if an customised callable is passed in `scoring_funcname`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">activitypattern</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                 <span class="n">targets</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">groups</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                 <span class="n">decoder</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span><span class="n">decoder_kwarg</span><span class="p">:</span><span class="nb">dict</span><span class="o">=</span><span class="p">{},</span>
+                 <span class="n">targetnames</span><span class="p">:</span><span class="nb">list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">regression</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">scoring_func</span><span class="p">:</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span><span class="nb">callable</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">scoring_funcname</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">REGRESSION_CATALOG</span>     <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">svr</span><span class="o">=</span> <span class="n">svm</span><span class="o">.</span><span class="n">SVR</span><span class="p">,</span> <span class="n">linear</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">)</span>
+        <span class="n">CLASSIFICATION_CATALOG</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">svc</span><span class="o">=</span> <span class="n">svm</span><span class="o">.</span><span class="n">LinearSVC</span><span class="p">,</span> <span class="n">logistic</span><span class="o">=</span><span class="n">LogisticRegression</span><span class="p">)</span>
+        <span class="n">SCORING_CATALOG</span>        <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">r2</span> <span class="o">=</span> <span class="n">r2_score</span><span class="p">,</span> <span class="n">acc</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">)</span>
+
+        <span class="c1">#check targets</span>
+        <span class="k">if</span> <span class="n">targets</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">targets</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">atleast2d</span><span class="p">(</span><span class="n">targets</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="k">assert</span> <span class="n">activitypattern</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">targets</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;Sample size mismatch: number of samples in activity pattern matrix is </span><span class="si">{</span><span class="n">activitypattern</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">, number of samples in ``targets`` is </span><span class="si">{</span><span class="n">targets</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multioutput</span> <span class="o">=</span> <span class="n">targets</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">targetnames</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">targetnames</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;t</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">j</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">targetnames</span><span class="p">))]</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">targetnames</span><span class="p">)</span> <span class="o">==</span> <span class="n">targets</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;number of target names must be equal to number of targetnames&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">targetnames</span> <span class="o">=</span> <span class="n">targetnames</span>
+
+        <span class="c1">#check groups</span>
+        <span class="n">groups</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">groups</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">activitypattern</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>  <span class="sa">f</span><span class="s2">&quot;Sample size mismatch: number of samples in activity pattern matrix is </span><span class="si">{</span><span class="n">activitypattern</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">, number of samples in ``groups`` is </span><span class="si">{</span><span class="n">groups</span><span class="o">.</span><span class="n">size</span><span class="si">}</span><span class="s2">&quot;</span> 
+        
+        <span class="c1"># decoder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basedecoder</span> <span class="o">=</span> <span class="n">decoder</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">decoder</span><span class="p">,</span><span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">regression</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">basedecoder</span> <span class="o">=</span> <span class="n">REGRESSION_CATALOG</span><span class="p">[</span><span class="n">decoder</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">multioutput</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">multi_meta</span>  <span class="o">=</span> <span class="n">MultiOutputRegressor</span>
+                <span class="n">scoring_func</span> <span class="o">=</span> <span class="s2">&quot;r2&quot;</span> <span class="k">if</span> <span class="n">scoring_func</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">scoring_func</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">basedecoder</span> <span class="o">=</span> <span class="n">CLASSIFICATION_CATALOG</span><span class="p">[</span><span class="n">decoder</span><span class="p">]</span>
+                <span class="n">scoring_func</span> <span class="o">=</span> <span class="s2">&quot;acc&quot;</span> <span class="k">if</span> <span class="n">scoring_func</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">scoring_func</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">multioutput</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">multi_meta</span>  <span class="o">=</span> <span class="n">MultiOutputClassifier</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder_kwarg</span> <span class="o">=</span> <span class="n">decoder_kwarg</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">score</span> <span class="o">=</span> <span class="n">scoring_func</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scorename</span> <span class="o">=</span> <span class="n">scoring_funcname</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scoring_func</span><span class="p">,</span><span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;customised&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scoring_func</span><span class="p">,</span><span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scorename</span> <span class="o">=</span> <span class="n">scoring_func</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">score</span> <span class="o">=</span> <span class="n">SCORING_CATALOG</span><span class="p">[</span><span class="n">scoring_func</span><span class="p">]</span>
+
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">activitypattern</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Y</span> <span class="o">=</span> <span class="n">targets</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="n">groups</span>
+    
+<div class="viewcode-block" id="PatternDecoding.fit">
+<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.estimators.html#zpyhelper.MVPA.estimators.PatternDecoding.fit">[docs]</a>
+    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run estimator.   </span>
+<span class="sd">         After self.fit() is called, `result` attribute of the estimator will be set, it will be an 1D numpy array.</span>
+
+<span class="sd">         Run decoding in cross-validation. data is splitted according to `self.groups`. Leave-one-group-out cross-validation is used. The result saved is [average fit score, average cv evaluation score]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logo</span> <span class="o">=</span> <span class="n">LeaveOneGroupOut</span><span class="p">()</span>
+        <span class="n">fit_scores</span><span class="p">,</span> <span class="n">eval_scores</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="p">(</span><span class="n">fit_index</span><span class="p">,</span> <span class="n">eval_index</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">logo</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">)):</span>
+            <span class="c1">#print(f&quot;Fold {k}:&quot;)</span>
+            <span class="c1">#print(f&quot;  Fit: index={fit_index}, group={groups[fit_index]}&quot;)</span>
+            <span class="c1">#print(f&quot;  Evaluation:  index={eval_index}, group={groups[eval_index]}&quot;)</span>
+            <span class="n">X_fit</span><span class="p">,</span><span class="n">X_eval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">fit_index</span><span class="p">,:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">[</span><span class="n">eval_index</span><span class="p">,:]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">multioutput</span><span class="p">:</span>
+                <span class="n">decoder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">multi_meta</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basedecoder</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">decoder_kwarg</span><span class="p">))</span>
+                <span class="n">Y_fit</span><span class="p">,</span><span class="n">Y_eval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">[</span><span class="n">fit_index</span><span class="p">,:],</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">[</span><span class="n">eval_index</span><span class="p">,:]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">decoder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">basedecoder</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">decoder_kwarg</span><span class="p">)</span>
+                <span class="n">Y_fit</span><span class="p">,</span><span class="n">Y_eval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">[</span><span class="n">fit_index</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">[</span><span class="n">eval_index</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">decoder</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_fit</span><span class="p">,</span><span class="n">Y_fit</span><span class="p">)</span>
+            <span class="n">PRED_fit</span><span class="p">,</span>  <span class="n">PRED_eval</span>  <span class="o">=</span> <span class="n">decoder</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_fit</span><span class="p">),</span>      <span class="n">decoder</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_eval</span><span class="p">)</span>
+            <span class="n">score_fit</span><span class="p">,</span> <span class="n">score_eval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">PRED_fit</span><span class="p">,</span><span class="n">Y_fit</span><span class="p">),</span>  <span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">PRED_eval</span><span class="p">,</span><span class="n">Y_eval</span><span class="p">)</span>
+
+            <span class="n">fit_scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">score_fit</span><span class="p">)</span>
+            <span class="n">eval_scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">score_eval</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span><span class="n">_force_1d</span><span class="p">([</span><span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">fit_scores</span><span class="p">),</span><span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">eval_scores</span><span class="p">)])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resultnames</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;fit&quot;</span><span class="p">,</span><span class="s2">&quot;eval&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+    
+<div class="viewcode-block" id="PatternDecoding.visualize">
+<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.estimators.html#zpyhelper.MVPA.estimators.PatternDecoding.visualize">[docs]</a>
+    <span class="k">def</span> <span class="nf">visualize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;show the score of the decoder in fit and evaliatopm set using scatter plots</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        matplotlib.figure.Figure</span>
+<span class="sd">            the handle of plotted figure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">result</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+        <span class="n">fig</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">size</span><span class="p">),</span><span class="n">y</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Score: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="PatternDecoding.__str__">
+<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.estimators.html#zpyhelper.MVPA.estimators.PatternDecoding.__str__">[docs]</a>
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the name of estimator class  </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;PatternDecoding&quot;</span></div>
+
+    
+<div class="viewcode-block" id="PatternDecoding.get_details">
+<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.estimators.html#zpyhelper.MVPA.estimators.PatternDecoding.get_details">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_details</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the details of estimator class in a dictonary, data will be serialized so that it can be written into JSON</span>
+<span class="sd">        &quot;&quot;&quot;</span>        
+        <span class="n">details</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="fm">__str__</span><span class="p">(),</span>
+                   <span class="s2">&quot;scorenames&quot;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">resultnames</span><span class="p">,</span>
+                   <span class="s2">&quot;scores&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">result</span>
+                  <span class="p">}</span>
+        <span class="k">return</span>  <span class="n">details</span></div>
+</div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">zpyhelper</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_autosummary/zpyhelper.html">zpyhelper</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Zilu Liang.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

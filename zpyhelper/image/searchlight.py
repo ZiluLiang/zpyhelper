@@ -42,8 +42,8 @@ def _apply_mask_and_get_affinity(seeds,
     This function is adapted from `_apply_mask_and_get_affinity` from the `nilearn.maskers.nifti_spheres_masker` module
     (https://github.com/nilearn/nilearn/blob/0d379462d8f84344056308d4d096caf78954ca6d/nilearn/input_data/nifti_spheres_masker.py) \n
     
-    Original Documentation: 
-    ----------
+    Original Documentation
+    -----------------------
     Get only the rows which are occupied by sphere at given seed locations and the provided radius.
     Rows are in target_affine and target_shape space.
     
