@@ -40,7 +40,7 @@ def _apply_mask_and_get_affinity(seeds,
                                  n_jobs:int=cpu_count()):
     """
     This function is adapted from `_apply_mask_and_get_affinity` from the `nilearn.maskers.nifti_spheres_masker` module
-    (https://github.com/nilearn/nilearn/blob/0d379462d8f84344056308d4d096caf78954ca6d/nilearn/input_data/nifti_spheres_masker.py)
+    (https://github.com/nilearn/nilearn/blob/0d379462d8f84344056308d4d096caf78954ca6d/nilearn/input_data/nifti_spheres_masker.py) \n
     
     Original Documentation: 
     ----------
@@ -49,7 +49,7 @@ def _apply_mask_and_get_affinity(seeds,
     
     Adaptation 
     ----------
-    This function is adapted to:
+    This function is adapted to:  \n
     1. impose minimum voxel number contraints and avoid throwing warnings when an empty sphere/insufficient voxel number is detected.
     The current script handle empty sphere or sphere with insufficient voxel number using one of the three approaches by specifying `empty_policy` argument:  
         - ``'fill'``: conduct new search with the same algorithm but incrementing searchlight sphere radius for empty spheres  
@@ -227,6 +227,46 @@ def _apply_mask_and_get_affinity(seeds,
     return Xs, A
 
 class MVPASearchLight:
+    """Class for running searchlight analysis. Once instantiated, can be used to run multiple searchlight analyses.\n
+
+
+    Example
+    -------
+    For example, the following code instantiates a searchlight instance, and then runs a regression searchlight and then a decoding searchlight.
+    ```
+    SearchLight = MVPASearchLight(patternimg_paths, mask_img_path, residimg_paths, process_mask_img_path, radius, preproc_steps, njobs)
+    subSearchLight.run(estimator = MultipleRDMRegression, estimator_kwargs = regression_kwargs, outputpath = somepath,  outputregexp = 'beta_%04d.nii')
+    subSearchLight.run(estimator = PatternDecoding, estimator_kwargs = decoding_kwargs, outputpath = somepath,  outputregexp = 'acc_%04d.nii')
+    ```
+
+    Parameters
+    ----------
+    patternimg_paths : str or list
+        path to the activity pattern images. It can be path to a 4D image or paths to multiple 3D images.
+    mask_img_path : str
+        path to the mask image. The mask image is a boolean image specifying voxels whose signals should be included into computation (of neural rdm etc)
+    residimg_paths : str or list
+        path to the residual images. It can be path to a 4D image or paths to multiple 3D images. It will be used if multivariate noise normalization is required
+    process_mask_img_path : str, optional
+        path to the process mask image. The process mask image is a boolean image specifying voxels on which searchlight analysis is performed. If None, will use the mask_img_path by default None
+    radius : float, optional
+        the radius of the searchlight sphere, by default 12.5
+    preproc_steps:dict, optional
+        preprocesss steps applied to the activity pattern matrix before calling estimator\n
+        for example: \n
+        ```
+        preproc_steps = {
+            "MVNN": [normalise_multivariate_noise,
+                        {"ap_groups":apgroup,"resid_groups":rsgroup}
+                    ],
+            "PCA": [extract_pc,{"n_components":3}],
+            "AOE": [average_odd_even_session,{"session":session}],
+            }
+        ```
+
+    njobs : int, optional
+        number of parallel jobs, by default 1
+    """
     def __init__(self,
                  patternimg_paths,
                  mask_img_path:str,
@@ -235,36 +275,7 @@ class MVPASearchLight:
                  radius:float=12.5,
                  preproc_steps:dict={},
                  njobs:int=1):
-        """_summary_
 
-        Parameters
-        ----------
-        patternimg_paths : str or list
-            path to the activity pattern images. It can be path to a 4D image or paths to multiple 3D images.
-        mask_img_path : str
-            path to the mask image. The mask image is a boolean image specifying voxels whose signals should be included into computation (of neural rdm etc)
-        residimg_paths : str or list
-            path to the residual images. It can be path to a 4D image or paths to multiple 3D images. It will be used if multivariate noise normalization is required
-        process_mask_img_path : str, optional
-            path to the process mask image. The process mask image is a boolean image specifying voxels on which searchlight analysis is performed. If None, will use the mask_img_path by default None
-        radius : float, optional
-            the radius of the searchlight sphere, by default 12.5
-        preproc_steps:dict, optional
-            preprocesss steps applied to the activity pattern matrix before calling estimator\n
-            for example: \n
-            ```
-            preproc_steps = {
-                "MVNN": [normalise_multivariate_noise,
-                         {"ap_groups":apgroup,"resid_groups":rsgroup}
-                        ],
-                "PCA": [extract_pc,{"n_components":3}],
-                "AOE": [average_odd_even_session,{"session":session}],
-                }
-            ```
-
-        njobs : int, optional
-            number of parallel jobs, by default 1
-        """
         self.pattern_img      = _check_and_load_images(patternimg_paths,mode="concatenate")
         if len(residimg_paths)>1:
             self.resid_img    = _check_and_load_images(residimg_paths,mode="concatenate")
@@ -351,7 +362,22 @@ class MVPASearchLight:
         self.write(result,estimator_details,outputpath,outputregexp)
         return self
     
-    def write(self,result,estimator_details,outputpath,outputregexp,ensure_finite:bool=False):
+    def write(self,result:numpy.ndarray,estimator_details:str,outputpath:str,outputregexp:str,ensure_finite:bool=False):
+        """write result to nii file
+
+        Parameters
+        ----------
+        result : numpy.ndarray
+            result to write
+        estimator_details : str
+            description of estimator details
+        outputpath : str
+            directory to save the nii file
+        outputregexp : str
+            regular expression used to name the nii file
+        ensure_finite : bool, optional
+            whether or not to replace nans. If `True`, nans will be saved as zero. If `False`, will keep as nan. by default False, by default False
+        """
         if '.nii' not in outputregexp:
             outputregexp = f'{outputregexp}.nii'
         checkdir(outputpath)
@@ -370,7 +396,7 @@ class MVPASearchLight:
 
     
     def fitPatchGroup(self,neighbour_idx_list:list,thread_id:int,total:int, estimator_kwargs:dict,verbose:bool = True):
-        """_summary_
+        """run analysis in a group of searchlight patches
 
         Parameters
         ----------
@@ -441,6 +467,7 @@ class MVPASearchLight:
 
     def genPatches(self):
         """
+        generate "patches" of searchlight: \n
         extract wholebrain activity pattern matrix and find indices of voxels that should be included in each searchlight sphere
         """
         print("generating searchlight patches")
