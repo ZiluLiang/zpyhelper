@@ -1,4 +1,4 @@
 furo==2021.11.16
 myst_parser
-sphinxcontrib-apidoc
+sphinxcontrib-apidoc==0.1.0 
 numpydoc==1.7.0
