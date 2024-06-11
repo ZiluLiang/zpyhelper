@@ -13,7 +13,12 @@ Zilu Liang @HIPlab Oxford
 import abc
 import numpy
 import scipy
-from   sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression
+from sklearn.multioutput import MultiOutputRegressor,MultiOutputClassifier
+from sklearn.model_selection import LeaveOneGroupOut
+from sklearn.metrics import accuracy_score,r2_score
+from sklearn import svm
+
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas
@@ -21,7 +26,7 @@ import itertools
 import time
 from typing import Union
 
-from .rdm import lower_tri, compute_rdm
+from .rdm import lower_tri, compute_rdm, compute_rdm_residual
 from .preprocessors import split_data, scale_feature
 
 def _force_1d(x):
@@ -69,12 +74,18 @@ class PatternCorrelation(MetaEstimator):
                  modelnames:list=None,
                  rdm_metric:str="correlation",
                  type:str="spearman",
-                 ztransform:bool=False) -> None:        
+                 ztransform:bool=False,
+                 runonresidual:bool=False,
+                 controlrdms:Union[numpy.ndarray,list]=[]) -> None:        
 
         #neural rdm
         neuralrdm = compute_rdm(activitypattern,rdm_metric)
         self.rdm_shape = neuralrdm.shape        
-        self.Y,_ = lower_tri(neuralrdm)
+        # if run on residual, compute the residual after regressing out control rdm
+        if runonresidual:
+            self.Y = compute_rdm_residual(neuralrdm,controlrdms,squareform=False)
+        else:
+            self.Y,_ = lower_tri(neuralrdm)
 
         #model rdm and names        
         if isinstance(modelrdms,list):
@@ -176,7 +187,11 @@ class MultipleRDMRegression(MetaEstimator):
     standardize: bool, optional
         whether or not to standardize the model rdms and neural rdms before running regression, by default `True`
     """
-    def __init__(self,activitypattern:numpy.ndarray,modelrdms:Union[numpy.ndarray,list],modelnames:list=None,rdm_metric:str="correlation",standardize:bool=True) -> None:
+    def __init__(self,activitypattern:numpy.ndarray,
+                 modelrdms:Union[numpy.ndarray,list],modelnames:list=None,
+                 rdm_metric:str="correlation",standardize:bool=True,
+                 runonresidual:bool=False,
+                 controlrdms:Union[numpy.ndarray,list]=[]) -> None:
 
         #model rdm and names        
         if isinstance(modelrdms,list):
@@ -195,10 +210,14 @@ class MultipleRDMRegression(MetaEstimator):
         self.rdm_shape = neuralrdm.shape
         self.modelnames = modelnames
 
-        Y,_ = lower_tri(neuralrdm)
+        # if run on residual, compute the residual after regressing out control rdm
+        if runonresidual:
+            Y = compute_rdm_residual(neuralrdm,controlrdms,squareform=False)
+        else:
+            Y,_ = lower_tri(neuralrdm)
 
         self.n_reg = len(modelrdms) # number of model rdms
-        X = numpy.empty((len(Y),self.n_reg)) # X is a nvoxel * nmodel matrix
+        X = numpy.empty((len(Y),self.n_reg)) # X is a npair * nmodel matrix
         for j,m in enumerate(modelrdms):
             X[:,j],_ = lower_tri(m)
 
@@ -332,5 +351,116 @@ class NeuralRDMStability(MetaEstimator):
     def get_details(self):        
         details = {"name":self.__str__(),
                    "corrtype":self.type
+                  }
+        return  details
+
+class PatternDecoding(MetaEstimator):
+    """decode from neural activity pattern with cross validation
+
+    Parameters
+    ----------
+    activitypattern : numpy.ndarray
+        a 2D numpy array of size `(nsample,nfeature)`. the neural activity pattern matrix used for decoding.
+    targets : numpy.ndarray 
+        a 2D or 1D numpy array of size `(nsample,ntarget)` or `(nsample,)`.  Target values for prediction (class labels in classification, real numbers in regression).
+    groups : numpy.ndarray
+        a 1D numpy array of size `(nsample,)`. Group values used for splitting data into decoder fitting and evaluation set. Must have at least two unique values
+    decoder: str or an estimator object implementing decoding analysis with `fit` and `predict`
+        decoder used to perform the analysis
+    decoder_kwarg: dict 
+        arguments passed to decoder class to instantiate a decoder
+    regression: bool
+        regression or classification decoder. If ``True``, will find in regression decoders, if ``False``, will find in classification decoders. by default ``False``.
+    targetnames: list, optional
+        a list of model names. If `None` models will be named as m1,m2,..., by default `None`
+    scoring_func: str or callable, optional
+        a scoring function that will be used to compute the quality of prediction after fitting the decoder. If None, will use accuracy score for classification and use r_square for regression.
+    """
+    def __init__(self,activitypattern:numpy.ndarray,
+                 targets:numpy.ndarray,
+                 groups:numpy.ndarray,decoder:str,decoder_kwarg:dict={},targetnames:list=None,regression=False,scoring_func:Union[str,callable]=None) -> None:
+        REGRESSION_CATALOG     = dict(svr= svm.SVR)
+        CLASSIFICATION_CATALOG = dict(svc= svm.LinearSVC)
+        SCORING_CATALOG        = dict(r2 = r2_score, acc = accuracy_score)
+
+        #check targets
+        if targets.ndim == 1:
+            targets = numpy.atleast2d(targets).T
+        assert activitypattern.shape[0] == targets.shape[0], f"Sample size mismatch: number of samples in activity pattern matrix is {activitypattern.shape[0]}, number of samples in ``targets`` is {targets.shape[0]}"
+        self.multioutput = targets.shape[1] > 1
+
+        if targetnames is None:
+            targetnames = [f't{str(j)}' for j in range(len(targetnames))]
+        assert len(targetnames) == len(targets), 'number of target names must be equal to number of targetnames'
+        self.targetnames = targetnames
+
+        #check groups
+        groups = numpy.array(groups).flatten()
+        assert groups.size == activitypattern.shape[0],  f"Sample size mismatch: number of samples in activity pattern matrix is {activitypattern.shape[0]}, number of samples in ``groups`` is {groups.size}" 
+        
+        # decoder
+        self.basedecoder = decoder
+        if isinstance(decoder,str):
+            if regression:
+                self.basedecoder = REGRESSION_CATALOG[decoder]
+                if self.multioutput:
+                    self.multi_meta  = MultiOutputRegressor
+                scoring_func = "r2" if scoring_func is None else scoring_func
+            else:
+                self.basedecoder = CLASSIFICATION_CATALOG[decoder]
+                scoring_func = "acc" if scoring_func is None else scoring_func
+                if self.multioutput:
+                    self.multi_meta  = MultiOutputClassifier
+        self.decoder_kwarg = decoder_kwarg
+        
+        self.score = scoring_func
+        if isinstance(scoring_func,str):
+            self.score = SCORING_CATALOG[scoring_func]
+
+        
+        self.X = activitypattern
+        self.Y = targets
+        self.groups = groups
+    
+    def fit(self):
+        logo = LeaveOneGroupOut()
+        fit_scores, eval_scores = [], []
+        for k, (fit_index, eval_index) in enumerate(logo.split(self.X, self.Y, self.groups)):
+            #print(f"Fold {k}:")
+            #print(f"  Fit: index={fit_index}, group={groups[fit_index]}")
+            #print(f"  Evaluation:  index={eval_index}, group={groups[eval_index]}")
+            X_fit,X_eval = self.X[fit_index,:], self.X[eval_index,:]
+            if self.multioutput:
+                decoder = self.multi_meta(self.basedecoder(**self.decoder_kwarg))
+                Y_fit,Y_eval = self.Y[fit_index,:], self.Y[eval_index,:]
+            else:
+                decoder = self.basedecoder(**self.decoder_kwarg)
+                Y_fit,Y_eval = self.Y[fit_index,0], self.Y[eval_index,0]
+
+            decoder.fit(X_fit,Y_fit)
+            PRED_fit,  PRED_eval  = decoder.predict(X_fit),      decoder.predict(X_eval)
+            score_fit, score_eval = self.score(PRED_fit,Y_fit),  self.score(PRED_eval,Y_eval)
+
+            fit_scores.append(score_fit)
+            eval_scores.append(score_eval)
+
+        self.result =_force_1d([numpy.mean(fit_scores),numpy.mean(eval_scores)])
+        return self
+    
+    def visualize(self):
+        try:
+            self.result
+        except Exception:
+            self.fit()
+        fig,ax = plt.subplots(1,1,figsize = (5,5))
+        ax.scatter(x=numpy.arange(self.result.size),y=self.result)
+        fig.suptitle(f'R2: {self.score}')
+        return fig
+
+    def __str__(self) -> str:
+        return "PatternDecoding"
+    
+    def get_details(self):        
+        details = {"name":self.__str__(),
                   }
         return  details

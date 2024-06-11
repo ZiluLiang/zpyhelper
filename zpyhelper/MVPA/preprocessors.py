@@ -1,10 +1,5 @@
 
 """Methods for preprocessing activity pattern matrix
-
-Returns
--------
-_type_
-    _description_
 """
 
 import numpy
