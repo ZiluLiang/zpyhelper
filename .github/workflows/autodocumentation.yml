@@ -6,7 +6,7 @@ on:
 
 jobs:
   pages:
-    runs-on: ubuntu-20.04
+    runs-on: windows-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -19,3 +19,5 @@ jobs:
           pip install sphinx sphinx_rtd_theme myst_parser sphinxcontrib-apidoc numpydoc
       - id: deployment
         uses: sphinx-notes/pages@v3
+        with: 
+          documentation_path: docs
