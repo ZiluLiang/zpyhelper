@@ -1,5 +1,5 @@
 """
 MVPA.
 
-helper functions for performing MVPA analysis.
+helper functions for performing MVPA.
 """

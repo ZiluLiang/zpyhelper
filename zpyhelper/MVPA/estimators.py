@@ -1,27 +1,26 @@
 """ Estimator classes for MVPA analysis
-    All classes takes activity pattern matrix as an input and performs different types of RSA analysis based on the activity pattern matrix.
-    An estimator class has at least four methods:
-    (1) fit: by calling estimator.fit(), MVPA analysis is performed, `result` attribute of the estimator will be set, it will be an 1D numpy array.
-    (2) __str__: return the name of estimator class
-    (3) get_details: return the details of estimator class in a dictonary, data will be serialized so that it can be written into JSON 
-    (4) visualize: by calling estimator.visualize(), the result of RSA analysis will visualized, a figure handle will be returned
-
-Zilu Liang @HIPlab Oxford
-2023
+    All classes takes activity pattern matrix as an input and performs different types of RSA analysis based on the activity pattern matrix.  \n
+    An estimator class has at least three methods:  \n
+    (1) fit: by calling estimator.fit(), analysis is performed, `result` attribute of the estimator will be set, it will be an 1D numpy array.  \n
+    (2) __str__: return the name of estimator class  \n
+    (3) get_details: return the details of estimator class in a dictonary, data will be serialized so that it can be written into JSON    \n
+    Some estimator also comes with a plotting method:  \n
+    (4) visualize: by calling estimator.visualize(), the result of RSA analysis will visualized, a figure handle will be returned  \n
+  
 """
 
 import abc
 import numpy
 import scipy
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.multioutput import MultiOutputRegressor,MultiOutputClassifier
 from sklearn.model_selection import LeaveOneGroupOut
 from sklearn.metrics import accuracy_score,r2_score
 from sklearn import svm
 
 import matplotlib.pyplot as plt
+import matplotlib
 import seaborn as sns
-import pandas
 import itertools
 import time
 from typing import Union
@@ -34,23 +33,32 @@ def _force_1d(x):
     return numpy.atleast_1d(x).flatten()
 
 class MetaEstimator():
+    """Meta class for estimators
+    """
     def __init__(self) -> None:
         pass
 
     @abc.abstractmethod
     def fit(self):
+        """Run estimator.   
+         After self.fit() is called, `result` attribute of the estimator will be set, it will be an 1D numpy array.
+        """
         pass
 
     @abc.abstractmethod
     def __str__(self):
+        """Return the name of estimator class  
+        """
         pass
 
     @abc.abstractmethod
     def get_details(self):
+        """Return the details of estimator class in a dictonary, data will be serialized so that it can be written into JSON
+        """
         pass
 
 class PatternCorrelation(MetaEstimator):
-    """calculate the correlation between neural rdm and model rdm
+    """Calculate the correlation between neural rdm and model rdm
 
     Parameters
     ----------
@@ -124,6 +132,12 @@ class PatternCorrelation(MetaEstimator):
             self.outputtransform = lambda x: x
     
     def fit(self):
+        """Run estimator.   
+         After self.fit() is called, `result` attribute of the estimator will be set, it will be an 1D numpy array.
+
+         Note that pairwise exclusion is used. For each model, the lower triangular part of the model rdm and that of neural rdm are put into two columns. 
+         If one of the two columns contains a NaN , the corresponding row is omitted. This process is done separately for each model rdm when calculating correlation between that particular model rdm and neural rdm
+        """
         self.na_filters = []
         result = []
         for X in self.Xs:
@@ -136,7 +150,16 @@ class PatternCorrelation(MetaEstimator):
         self.result = _force_1d(result)
         return self
     
-    def visualize(self):
+    def visualize(self)->matplotlib.figure.Figure:
+        """show the model rdm(s) and neural rdm in heatmap.
+
+        Each subplot shows a model or neural rdm. The correlation between neural and model rdm is shown in subplot's title.
+
+        Returns
+        -------
+        matplotlib.figure.Figure
+            the handle of plotted figure
+        """
         try:
             self.result
         except Exception:
@@ -161,6 +184,8 @@ class PatternCorrelation(MetaEstimator):
         return fig
     
     def __str__(self) -> str:
+        """Return the name of estimator class  
+        """
         return f"PatternCorrelation with {self.type}"
     
     def get_details(self):        
@@ -227,6 +252,12 @@ class MultipleRDMRegression(MetaEstimator):
         self.standardize = standardize
     
     def fit(self):
+        """Run estimator.   
+         After self.fit() is called, `result` attribute of the estimator will be set, it will be an 1D numpy array.
+
+         Note that list-wise exclusion is used. The lower triangular part of the model rdm(s) and that of neural rdm are put into columns. 
+         If any one of the columns contains a NaN , the corresponding row is omitted.
+        """
         xna_filters = numpy.all(~numpy.isnan(self.X),1) # find out rows that are not nans in all columns
         self.na_filters = numpy.logical_and(~numpy.isnan(self.Y),xna_filters)
 
@@ -245,7 +276,16 @@ class MultipleRDMRegression(MetaEstimator):
         self.score  = reg.score(X,Y)
         return self
     
-    def visualize(self):
+    def visualize(self)->matplotlib.figure.Figure:
+        """show the model rdm(s) and neural rdm in heatmap.
+
+        Each subplot shows a model or neural rdm. The regression coefficient of model rdm is shown in subplot's title.
+
+        Returns
+        -------
+        matplotlib.figure.Figure
+            the handle of plotted figure
+        """
         try:
             self.result
         except Exception:
@@ -268,9 +308,13 @@ class MultipleRDMRegression(MetaEstimator):
         return fig
 
     def __str__(self) -> str:
+        """Return the name of estimator class  
+        """
         return "MultipleRDMRegression"
     
-    def get_details(self):        
+    def get_details(self):  
+        """Return the details of estimator class in a dictonary, data will be serialized so that it can be written into JSON
+        """      
         details = {"name":self.__str__(),
                    "standardize":self.standardize*1,
                    "NAfilters":self.na_filters.tolist(),
@@ -280,29 +324,29 @@ class MultipleRDMRegression(MetaEstimator):
         return  details
 
 class NeuralRDMStability(MetaEstimator):
+    """calculate the stability of neural RDM across different splits of data
+
+    Parameters
+    ----------
+    activitypattern : numpy.ndarray
+        a 2D numpy array. the neural activity pattern matrix used for computing representation dissimilarity matrix. size = (nsample,nfeatures)
+    groups : numpy.ndarray
+        array specifying the which group each row of activitypattern belongs to. Must have at least two unique values.
+    rdm_metric : str, optional
+        _dissimilarity/distance metric passed to `scipy.spatial.distance.pdist` to compute neural rdm from activity pattern matrix, by default `"correlation"`
+    type : str, optional
+        type of correlation measure, by default `"spearman"`.
+        must be one of: `"spearman", "pearson", "kendall", "linreg"`
+    ztransform: bool, optional
+        whether or not to perform fisher Z transform to the correlation coefficients, by default `False`.
+
+    Raises
+    ------
+    ValueError
+        ``groups`` must have at least two unique values
+    """
     def __init__(self,activitypattern:numpy.ndarray,groups:numpy.ndarray,
                  rdm_metric:str="correlation", type:str="spearman",ztransform:bool=False) -> None:
-        """calculate the stability of neural RDM across different splits of data
-
-        Parameters
-        ----------
-        activitypattern : numpy.ndarray
-            a 2D numpy array. the neural activity pattern matrix used for computing representation dissimilarity matrix. size = (nsample,nfeatures)
-        groups : numpy.ndarray
-            array specifying the which group each row of activitypattern belongs to. Must have at least two unique values.
-        rdm_metric : str, optional
-            _dissimilarity/distance metric passed to `scipy.spatial.distance.pdist` to compute neural rdm from activity pattern matrix, by default `"correlation"`
-        type : str, optional
-            type of correlation measure, by default `"spearman"`.
-            must be one of: `"spearman", "pearson", "kendall", "linreg"`
-        ztransform: bool, optional
-            whether or not to perform fisher Z transform to the correlation coefficients, by default `False`.
-
-        Raises
-        ------
-        ValueError
-            ``groups`` must have at least two unique values
-        """
         assert numpy.unique(groups).size>1
         self.Xs = split_data(activitypattern,groups)
         self.RDMs = [compute_rdm(X,rdm_metric) for X in self.Xs]
@@ -326,6 +370,11 @@ class NeuralRDMStability(MetaEstimator):
             self.outputtransform = lambda x: x
 
     def fit(self):
+        """Run estimator.   
+         After self.fit() is called, `result` attribute of the estimator will be set, it will be an 1D numpy array.
+
+         Neural RDM is calculated for each group. Correlation between every possible pair of groups are calculated. Then the average is taken over all the calculated correlation coefficients.
+        """
         result = []
         for rdm1,rdm2 in itertools.combinations(self.RDMs,2):
             X,Y = lower_tri(rdm1)[0],lower_tri(rdm2)[0]
@@ -336,9 +385,20 @@ class NeuralRDMStability(MetaEstimator):
         return self
     
     def __str__(self) -> str:
+        """Return the name of estimator class  
+        """
         return "NeuralRDMStability"
     
-    def visualize(self):
+    def visualize(self)->matplotlib.figure.Figure:
+        """show the neural rdm of different groups using heatmap.
+
+        Each subplot shows the neural rdm of one group.
+
+        Returns
+        -------
+        matplotlib.figure.Figure
+            the handle of plotted figure
+        """
         fig,axes = plt.subplots(1,len(self.RDMs),figsize = (10,5))
         for j,(g,m,ax) in enumerate(zip(self.groups,self.RDMs,axes)):
             v = numpy.full_like(m,fill_value=numpy.nan)
@@ -348,14 +408,17 @@ class NeuralRDMStability(MetaEstimator):
         fig.suptitle(f'average stability: {self.result}')
         return fig
     
-    def get_details(self):        
+    def get_details(self):
+        """Return the details of estimator class in a dictonary, data will be serialized so that it can be written into JSON
+        """
         details = {"name":self.__str__(),
                    "corrtype":self.type
                   }
         return  details
 
 class PatternDecoding(MetaEstimator):
-    """decode from neural activity pattern with cross validation
+    """decode from neural activity pattern with cross validation   
+    Important note: this hasn't been tested in whole-brain searchlight yet
 
     Parameters
     ----------
@@ -375,12 +438,16 @@ class PatternDecoding(MetaEstimator):
         a list of model names. If `None` models will be named as m1,m2,..., by default `None`
     scoring_func: str or callable, optional
         a scoring function that will be used to compute the quality of prediction after fitting the decoder. If None, will use accuracy score for classification and use r_square for regression.
+    scoring_funcname: str, optional
+        name of the scoring function if an customised callable is passed in `scoring_funcname`
     """
     def __init__(self,activitypattern:numpy.ndarray,
-                 targets:numpy.ndarray,
-                 groups:numpy.ndarray,decoder:str,decoder_kwarg:dict={},targetnames:list=None,regression=False,scoring_func:Union[str,callable]=None) -> None:
-        REGRESSION_CATALOG     = dict(svr= svm.SVR)
-        CLASSIFICATION_CATALOG = dict(svc= svm.LinearSVC)
+                 targets:numpy.ndarray, groups:numpy.ndarray,
+                 decoder:str,decoder_kwarg:dict={},
+                 targetnames:list=None,regression=False,
+                 scoring_func:Union[str,callable]=None,scoring_funcname:str=None) -> None:
+        REGRESSION_CATALOG     = dict(svr= svm.SVR, linear = LinearRegression)
+        CLASSIFICATION_CATALOG = dict(svc= svm.LinearSVC, logistic=LogisticRegression)
         SCORING_CATALOG        = dict(r2 = r2_score, acc = accuracy_score)
 
         #check targets
@@ -391,7 +458,7 @@ class PatternDecoding(MetaEstimator):
 
         if targetnames is None:
             targetnames = [f't{str(j)}' for j in range(len(targetnames))]
-        assert len(targetnames) == len(targets), 'number of target names must be equal to number of targetnames'
+        assert len(targetnames) == targets.shape[1], 'number of target names must be equal to number of targetnames'
         self.targetnames = targetnames
 
         #check groups
@@ -414,7 +481,9 @@ class PatternDecoding(MetaEstimator):
         self.decoder_kwarg = decoder_kwarg
         
         self.score = scoring_func
+        self.scorename = scoring_funcname if isinstance(scoring_func,str) else "customised"
         if isinstance(scoring_func,str):
+            self.scorename = scoring_func
             self.score = SCORING_CATALOG[scoring_func]
 
         
@@ -423,6 +492,11 @@ class PatternDecoding(MetaEstimator):
         self.groups = groups
     
     def fit(self):
+        """Run estimator.   
+         After self.fit() is called, `result` attribute of the estimator will be set, it will be an 1D numpy array.
+
+         Run decoding in cross-validation. data is splitted according to `self.groups`. Leave-one-group-out cross-validation is used. The result saved is [average fit score, average cv evaluation score]
+        """
         logo = LeaveOneGroupOut()
         fit_scores, eval_scores = [], []
         for k, (fit_index, eval_index) in enumerate(logo.split(self.X, self.Y, self.groups)):
@@ -445,22 +519,36 @@ class PatternDecoding(MetaEstimator):
             eval_scores.append(score_eval)
 
         self.result =_force_1d([numpy.mean(fit_scores),numpy.mean(eval_scores)])
+        self.resultnames = ["fit","eval"]
         return self
     
-    def visualize(self):
+    def visualize(self)->matplotlib.figure.Figure:
+        """show the score of the decoder in fit and evaliatopm set using scatter plots
+
+        Returns
+        -------
+        matplotlib.figure.Figure
+            the handle of plotted figure
+        """
         try:
             self.result
         except Exception:
             self.fit()
         fig,ax = plt.subplots(1,1,figsize = (5,5))
         ax.scatter(x=numpy.arange(self.result.size),y=self.result)
-        fig.suptitle(f'R2: {self.score}')
+        fig.suptitle(f'Score: {self.result}')
         return fig
 
     def __str__(self) -> str:
+        """Return the name of estimator class  
+        """
         return "PatternDecoding"
     
-    def get_details(self):        
+    def get_details(self):
+        """Return the details of estimator class in a dictonary, data will be serialized so that it can be written into JSON
+        """        
         details = {"name":self.__str__(),
+                   "scorenames":self.resultnames,
+                   "scores": self.result
                   }
         return  details

@@ -25,7 +25,19 @@ def checkdir(dirs:Union[list,str]):
         if not os.path.exists(dir):
             os.makedirs(dir)
 
-def is_jsonable(x):
+def is_jsonable(x)->bool:
+    """check if an object is JSON serializable
+
+    Parameters
+    ----------
+    x : any
+        the object to check
+
+    Returns
+    -------
+    bool
+        `True`: serializable
+    """
     try:
         json.dumps(x)
         return True
