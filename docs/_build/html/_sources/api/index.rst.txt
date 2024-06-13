@@ -1,5 +1,5 @@
 .. zpyhelper documentation master file, created by
-   sphinx-quickstart on Tue Jun 11 20:55:02 2024.
+   sphinx-quickstart on Thu Jun 13 09:46:52 2024.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
