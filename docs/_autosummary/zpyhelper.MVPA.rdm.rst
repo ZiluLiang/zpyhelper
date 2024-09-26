@@ -1,4 +1,4 @@
-zpyhelper.MVPA.rdm
+﻿zpyhelper.MVPA.rdm
 ==================
 
 .. automodule:: zpyhelper.MVPA.rdm
@@ -20,6 +20,7 @@ zpyhelper.MVPA.rdm
       compute_rdm_nomial
       compute_rdm_residual
       lower_tri
+      nan_equal
       upper_tri
    
    

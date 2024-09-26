@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>zpyhelper.MVPA.rdm module &#8212; zpyhelper  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=61cd365c" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
@@ -96,7 +96,8 @@ based on formula in <a class="reference external" href="https://en.wikipedia.org
 <dl class="py function">
 <dt class="sig sig-object py" id="zpyhelper.MVPA.rdm.compute_rdm_identity">
 <span class="sig-prename descclassname"><span class="pre">zpyhelper.MVPA.rdm.</span></span><span class="sig-name descname"><span class="pre">compute_rdm_identity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/zpyhelper/MVPA/rdm.html#compute_rdm_identity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.rdm.compute_rdm_identity" title="Link to this definition">¶</a></dt>
-<dd><p>comput the dissimilarity matrix based on sample identity, if the pair have the same value, distance will be zero, otherwise will be one.</p>
+<dd><p>comput the dissimilarity matrix based on sample identity, if the pair have the same value, distance will be zero, otherwise will be one.
+This is similar to the ‘scipy.spatial.distance.hamming’ except that nan values will return nan instead of included in distance computation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>pattern_matrix</strong> (<em>numpy.ndarray</em>) – pattern_matrix containing samples’ identity, of size <code class="docutils literal notranslate"><span class="pre">(nsample,)</span></code></p>
@@ -114,7 +115,7 @@ based on formula in <a class="reference external" href="https://en.wikipedia.org
 <dt class="sig sig-object py" id="zpyhelper.MVPA.rdm.compute_rdm_nomial">
 <span class="sig-prename descclassname"><span class="pre">zpyhelper.MVPA.rdm.</span></span><span class="sig-name descname"><span class="pre">compute_rdm_nomial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/zpyhelper/MVPA/rdm.html#compute_rdm_nomial"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.rdm.compute_rdm_nomial" title="Link to this definition">¶</a></dt>
 <dd><p>compute the dissimilarity matrix based on samples’ nomial features. Must have at least 2 features, otherwise should use <code class="docutils literal notranslate"><span class="pre">compute_rdm_identity</span></code> instead.
-Features are assumed to be orthogonal so the distance will be Euclidean distance where nomial features are one-hot encoded.</p>
+This is similar to the ‘scipy.spatial.distance.hamming’ except that nan values will return nan instead of included in distance computation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>pattern_matrix</strong> (<em>numpy.ndarray</em>) – pattern_matrix containing samples’ features, of size <code class="docutils literal notranslate"><span class="pre">(nsample,nfeature)</span></code></p>
@@ -157,6 +158,23 @@ Features are assumed to be orthogonal so the distance will be Euclidean distance
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>tuple</strong> (<em>(rdm_tril,lower_tril_idx)</em>) – rdm_tril: the lower triangular part of the RDM, excluding the diagonal elements
 lower_tril_idx: the index of the lower triangular part of the RDM, excluding the diagonal elements</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.rdm.nan_equal">
+<span class="sig-prename descclassname"><span class="pre">zpyhelper.MVPA.rdm.</span></span><span class="sig-name descname"><span class="pre">nan_equal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/zpyhelper/MVPA/rdm.html#nan_equal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.rdm.nan_equal" title="Link to this definition">¶</a></dt>
+<dd><p>check element-wise if two numpy array are equal. nan value comparisons will result in nan. In the result array, boolean values are converted in to 1 and 0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<em>numpy.ndarray</em>) – Input array</p></li>
+<li><p><strong>b</strong> (<em>numpy.ndarray</em>) – Input array</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>numpy.ndarray</em> – The result array from comparison, has the same shape as input arrays.</p>
 </dd>
 </dl>
 </dd></dl>
