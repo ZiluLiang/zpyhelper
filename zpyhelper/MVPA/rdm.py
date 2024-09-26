@@ -129,15 +129,31 @@ def compute_rdm(pattern_matrix:numpy.ndarray,metric:str) -> numpy.ndarray:
     """
     # check X 
     X = check_array(pattern_matrix,ensure_dim=2,min_sample=2,min_feature=1)
-    # drop values that is nan
-    na_filters = numpy.all([~numpy.isnan(X[j,:]) for j in range(numpy.shape(X)[0])],0)
-    X_drop_na = X[:,na_filters]
-    # check X after dropping nan
-    X_drop_na = check_array(X_drop_na,ensure_dim=2,min_sample=2,min_feature=1)
-    return squareform(pdist(X_drop_na, metric=metric)) 
+    return squareform(pdist(X, metric=metric)) 
+
+def nan_equal(a:numpy.ndarray,b:numpy.ndarray)->numpy.ndarray:
+    """check element-wise if two numpy array are equal. nan value comparisons will result in nan. In the result array, boolean values are converted in to 1 and 0.
+
+    Parameters
+    ----------
+    a : numpy.ndarray
+        Input array
+    b : numpy.ndarray
+        Input array
+
+    Returns
+    -------
+    numpy.ndarray
+        The result array from comparison, has the same shape as input arrays.
+    """
+    res = 1.*(a == b)
+    nan_filter = numpy.any([numpy.isnan(a),numpy.isnan(b)],axis=0)
+    res[nan_filter] = numpy.nan
+    return res
 
 def compute_rdm_identity(pattern_matrix:numpy.ndarray) -> numpy.ndarray:
     """comput the dissimilarity matrix based on sample identity, if the pair have the same value, distance will be zero, otherwise will be one.
+    This is similar to the 'scipy.spatial.distance.hamming' except that nan values will return nan instead of included in distance computation.
 
     Parameters
     ----------
@@ -157,11 +173,11 @@ def compute_rdm_identity(pattern_matrix:numpy.ndarray) -> numpy.ndarray:
     # check X 
     identity_arr = check_array(numpy.squeeze(pattern_matrix),ensure_dim=1,min_sample=2)
     X,Y = numpy.meshgrid(identity_arr,identity_arr)
-    return 1. - abs(X==Y)# if same, distance=0
+    return 1. - nan_equal(X,Y)# if same, distance=0
 
 def compute_rdm_nomial(pattern_matrix:numpy.ndarray) -> numpy.ndarray:
     """compute the dissimilarity matrix based on samples' nomial features. Must have at least 2 features, otherwise should use ``compute_rdm_identity`` instead.
-    Features are assumed to be orthogonal so the distance will be Euclidean distance where nomial features are one-hot encoded.
+    This is similar to the 'scipy.spatial.distance.hamming' except that nan values will return nan instead of included in distance computation.
 
     Parameters
     ----------
@@ -180,14 +196,9 @@ def compute_rdm_nomial(pattern_matrix:numpy.ndarray) -> numpy.ndarray:
     """
     # check X 
     X = check_array(pattern_matrix,ensure_dim=2,min_sample=2,min_feature=2)
-    # drop values that is nan
-    na_filters = numpy.all([~numpy.isnan(X[j,:]) for j in range(X.shape[0])],0)
-    X_drop_na = X[:,na_filters]
-    # check X after dropping nan
-    X_drop_na = check_array(X_drop_na,ensure_dim=2,min_sample=2,min_feature=2)
     # compute rdm
-    feature_rdms = [compute_rdm_identity(X_drop_na[:,k]) for k in range(X_drop_na.shape[1])]
-    rdm = numpy.sqrt(numpy.sum(feature_rdms,axis=0))
+    feature_rdms = [compute_rdm_identity(X[:,k]) for k in range(X.shape[1])]
+    rdm = numpy.mean(feature_rdms,axis=0)
     return rdm
 
 def compute_rdm_residual(rdm:numpy.ndarray,control_rdms:Union[list,numpy.ndarray],squareform=True):

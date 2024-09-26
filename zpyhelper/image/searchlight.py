@@ -277,7 +277,7 @@ class MVPASearchLight:
                  njobs:int=1):
 
         self.pattern_img      = _check_and_load_images(patternimg_paths,mode="concatenate")
-        if len(residimg_paths)>1:
+        if len(residimg_paths)>=1:
             self.resid_img    = _check_and_load_images(residimg_paths,mode="concatenate")
         else:
             self.resid_img    = None

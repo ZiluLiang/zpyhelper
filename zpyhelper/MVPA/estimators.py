@@ -12,6 +12,7 @@
 import abc
 import numpy
 import scipy
+import scipy.linalg
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.multioutput import MultiOutputRegressor,MultiOutputClassifier
 from sklearn.model_selection import LeaveOneGroupOut
@@ -25,7 +26,7 @@ import itertools
 import time
 from typing import Union
 
-from .rdm import lower_tri, compute_rdm, compute_rdm_residual
+from .rdm import lower_tri, compute_rdm, compute_rdm_residual, compute_R2
 from .preprocessors import split_data, scale_feature
 
 def _force_1d(x):
@@ -270,10 +271,13 @@ class MultipleRDMRegression(MetaEstimator):
             X = self.X[self.na_filters,:]
             Y = self.Y[self.na_filters]
 
-        reg = LinearRegression().fit(X,Y)
-        self.reg = reg
-        self.result = _force_1d(reg.coef_)
-        self.score  = reg.score(X,Y)
+        des_mat = numpy.hstack(
+            [X,numpy.ones((X.shape[0],1))]
+        )
+        coef,_,_,_ = scipy.linalg.lstsq(des_mat,Y)
+        self.result = _force_1d(coef[:-1])
+        self.R2  = compute_R2(des_mat@coef,Y,X.shape[1])[0]
+        self.adjR2  = compute_R2(des_mat@coef,Y,X.shape[1])[1]
         return self
     
     def visualize(self)->matplotlib.figure.Figure:
@@ -304,7 +308,7 @@ class MultipleRDMRegression(MetaEstimator):
                 axes.flatten()[j].set_title(t)
             else:
                 axes.flatten()[j].set_title(f"{t}:{self.result[j-1]}")
-        fig.suptitle(f'R2: {self.score}')
+        fig.suptitle(f'Adjusted R2: {self.adjR2}')
         return fig
 
     def __str__(self) -> str:
@@ -319,7 +323,7 @@ class MultipleRDMRegression(MetaEstimator):
                    "standardize":self.standardize*1,
                    "NAfilters":self.na_filters.tolist(),
                    "modelRDMs":dict(zip(self.modelnames,[x.tolist() for x in self.X.T])),
-                   "score":self.score
+                   "score":[self.R2, self.adjR2]
                   }
         return  details
 

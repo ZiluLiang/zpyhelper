@@ -16,7 +16,7 @@ def scale_feature(X:numpy.ndarray,s_dir:int=2,standardize:bool=True) -> numpy.nd
     X : numpy.ndarray
         the 1D or 2D numpy array that needs to be normalized
     s_dir : int, optional
-        the direction along which to perform standardization
+        the direction along which to perform standardization\n
         if 0, will perfrom standardization independently for each row  \n
         if 1, will perform standardization independently for each column  \n      
         if 2, will perform standardization on the whole matrix  \n
