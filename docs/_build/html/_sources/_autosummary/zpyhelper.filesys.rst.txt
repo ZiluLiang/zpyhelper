@@ -4,11 +4,6 @@ zpyhelper.filesys
 .. automodule:: zpyhelper.filesys
 
    
-   
-   
-
-   
-   
    .. rubric:: Functions
 
    .. autosummary::
@@ -16,15 +11,3 @@ zpyhelper.filesys
       checkdir
       is_jsonable
    
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-

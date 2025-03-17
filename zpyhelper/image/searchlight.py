@@ -22,10 +22,7 @@ from .niidatahandler import _check_and_load_images,write_data_to_image
 
 import nilearn
 from nilearn import image, masking
-from nilearn._utils.niimg_conversions import (
-    _safe_get_data,
-    check_niimg_3d,
-)
+from nilearn._utils.niimg_conversions import _safe_get_data,check_niimg_3d
 from nilearn.decoding.searchlight import GroupIterator
 from sklearn import neighbors
 

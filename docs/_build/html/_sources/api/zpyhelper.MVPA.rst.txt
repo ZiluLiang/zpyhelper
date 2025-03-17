@@ -3,8 +3,8 @@ zpyhelper.MVPA package
 
 .. automodule:: zpyhelper.MVPA
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 Submodules
 ----------

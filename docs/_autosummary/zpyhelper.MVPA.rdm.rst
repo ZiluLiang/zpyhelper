@@ -4,11 +4,6 @@
 .. automodule:: zpyhelper.MVPA.rdm
 
    
-   
-   
-
-   
-   
    .. rubric:: Functions
 
    .. autosummary::
@@ -23,15 +18,3 @@
       nan_equal
       upper_tri
    
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-

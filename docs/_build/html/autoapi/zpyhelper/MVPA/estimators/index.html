@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>zpyhelper.MVPA.estimators &#8212; zpyhelper  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+    <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="zpyhelper.MVPA.preprocessors" href="../preprocessors/index.html" />
+    <link rel="prev" title="zpyhelper.MVPA" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-zpyhelper.MVPA.estimators">
+<span id="zpyhelper-mvpa-estimators"></span><h1>zpyhelper.MVPA.estimators<a class="headerlink" href="#module-zpyhelper.MVPA.estimators" title="Link to this heading">¶</a></h1>
+<p>Estimator classes for MVPA analysis
+All classes takes activity pattern matrix as an input and performs different types of RSA analysis based on the activity pattern matrix.</p>
+<p>An estimator class has at least three methods:</p>
+<ol class="arabic simple">
+<li><p>fit: by calling estimator.fit(), analysis is performed, <cite>result</cite> attribute of the estimator will be set, it will be an 1D numpy array.</p></li>
+<li><p>__str__: return the name of estimator class</p></li>
+<li><p>get_details: return the details of estimator class in a dictonary, data will be serialized so that it can be written into JSON</p></li>
+</ol>
+<p>Some estimator also comes with a plotting method:</p>
+<ol class="arabic simple" start="4">
+<li><p>visualize: by calling estimator.visualize(), the result of RSA analysis will visualized, a figure handle will be returned</p></li>
+</ol>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#zpyhelper.MVPA.estimators.MetaEstimator" title="zpyhelper.MVPA.estimators.MetaEstimator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MetaEstimator</span></code></a></p></td>
+<td><p>Meta class for estimators</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#zpyhelper.MVPA.estimators.PatternCorrelation" title="zpyhelper.MVPA.estimators.PatternCorrelation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PatternCorrelation</span></code></a></p></td>
+<td><p>Calculate the correlation between neural rdm and model rdm</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#zpyhelper.MVPA.estimators.MultipleRDMRegression" title="zpyhelper.MVPA.estimators.MultipleRDMRegression"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MultipleRDMRegression</span></code></a></p></td>
+<td><p>estimate the regression coefficient when using the model rdms to predict neural rdm</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#zpyhelper.MVPA.estimators.NeuralRDMStability" title="zpyhelper.MVPA.estimators.NeuralRDMStability"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NeuralRDMStability</span></code></a></p></td>
+<td><p>calculate the stability of neural RDM across different splits of data</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#zpyhelper.MVPA.estimators.PatternDecoding" title="zpyhelper.MVPA.estimators.PatternDecoding"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PatternDecoding</span></code></a></p></td>
+<td><p>decode from neural activity pattern with cross validation</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#zpyhelper.MVPA.estimators._force_1d" title="zpyhelper.MVPA.estimators._force_1d"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_force_1d</span></code></a>(x)</p></td>
+<td><p>force array to be 1D</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators._force_1d">
+<span class="sig-prename descclassname"><span class="pre">zpyhelper.MVPA.estimators.</span></span><span class="sig-name descname"><span class="pre">_force_1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#_force_1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators._force_1d" title="Link to this definition">¶</a></dt>
+<dd><p>force array to be 1D</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.MetaEstimator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zpyhelper.MVPA.estimators.</span></span><span class="sig-name descname"><span class="pre">MetaEstimator</span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#MetaEstimator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.MetaEstimator" title="Link to this definition">¶</a></dt>
+<dd><p>Meta class for estimators</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.MetaEstimator.fit">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#MetaEstimator.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.MetaEstimator.fit" title="Link to this definition">¶</a></dt>
+<dd><p>Run estimator.
+After self.fit() is called, <cite>result</cite> attribute of the estimator will be set, it will be an 1D numpy array.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.MetaEstimator.__str__">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#MetaEstimator.__str__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.MetaEstimator.__str__" title="Link to this definition">¶</a></dt>
+<dd><p>Return the name of estimator class</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.MetaEstimator.get_details">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_details</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#MetaEstimator.get_details"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.MetaEstimator.get_details" title="Link to this definition">¶</a></dt>
+<dd><p>Return the details of estimator class in a dictonary, data will be serialized so that it can be written into JSON</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.PatternCorrelation">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zpyhelper.MVPA.estimators.</span></span><span class="sig-name descname"><span class="pre">PatternCorrelation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">activitypattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modelrdms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modelnames</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rdm_metric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'correlation'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'spearman'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ztransform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runonresidual</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">controlrdms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#PatternCorrelation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.PatternCorrelation" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#zpyhelper.MVPA.estimators.MetaEstimator" title="zpyhelper.MVPA.estimators.MetaEstimator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MetaEstimator</span></code></a></p>
+<p>Calculate the correlation between neural rdm and model rdm</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>activitypattern</strong> (<em>numpy.ndarray</em>) – a 2D numpy array. the neural activity pattern matrix used for computing representation dissimilarity matrix. size = (nsample,nfeatures)</p></li>
+<li><p><strong>modelrdm</strong> (<em>numpy.ndarray or list of numpy.ndarray</em>) – a 2D numpy array. the dissimilarity matrices from different models of representation. size = (nsample,nsample)</p></li>
+<li><p><strong>modelnames</strong> (<em>list</em>) – a list of model names. If <cite>None</cite> models will be named as <cite>m1,m2,…</cite>, by default <cite>None</cite></p></li>
+<li><p><strong>rdm_metric</strong> (<em>str, optional</em>) – dissimilarity/distance metric passed to <cite>scipy.spatial.distance.pdist</cite> to compute neural rdm from activity pattern matrix, by default <cite>“correlation”</cite></p></li>
+<li><p><strong>type</strong> (<em>str, optional</em>) – type of correlation measure, by default <cite>“spearman”</cite>.
+must be one of: <cite>“spearman”, “pearson”, “kendall”, “linreg”</cite></p></li>
+<li><p><strong>ztransform</strong> (<em>bool, optional</em>) – whether or not to perform fisher Z transform to the correlation coefficients, by default <cite>False</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.PatternCorrelation.rdm_shape">
+<span class="sig-name descname"><span class="pre">rdm_shape</span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#PatternCorrelation.rdm_shape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.PatternCorrelation.rdm_shape" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.PatternCorrelation.Xs">
+<span class="sig-name descname"><span class="pre">Xs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#PatternCorrelation.Xs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.PatternCorrelation.Xs" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.PatternCorrelation.modelnames">
+<span class="sig-name descname"><span class="pre">modelnames</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#PatternCorrelation.modelnames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.PatternCorrelation.modelnames" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.PatternCorrelation.nX">
+<span class="sig-name descname"><span class="pre">nX</span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#PatternCorrelation.nX"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.PatternCorrelation.nX" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.PatternCorrelation.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#PatternCorrelation.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.PatternCorrelation.fit" title="Link to this definition">¶</a></dt>
+<dd><p>Run estimator.
+After self.fit() is called, <cite>result</cite> attribute of the estimator will be set, it will be an 1D numpy array.</p>
+<p>Note that pairwise exclusion is used. For each model, the lower triangular part of the model rdm and that of neural rdm are put into two columns.
+If one of the two columns contains a NaN , the corresponding row is omitted. This process is done separately for each model rdm when calculating correlation between that particular model rdm and neural rdm</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.PatternCorrelation.visualize">
+<span class="sig-name descname"><span class="pre">visualize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">matplotlib.figure.Figure</span></span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#PatternCorrelation.visualize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.PatternCorrelation.visualize" title="Link to this definition">¶</a></dt>
+<dd><p>show the model rdm(s) and neural rdm in heatmap.</p>
+<p>Each subplot shows a model or neural rdm. The correlation between neural and model rdm is shown in subplot’s title.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>matplotlib.figure.Figure</em> – the handle of plotted figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.PatternCorrelation.__str__">
+<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#PatternCorrelation.__str__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.PatternCorrelation.__str__" title="Link to this definition">¶</a></dt>
+<dd><p>Return the name of estimator class</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.PatternCorrelation.get_details">
+<span class="sig-name descname"><span class="pre">get_details</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#PatternCorrelation.get_details"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.PatternCorrelation.get_details" title="Link to this definition">¶</a></dt>
+<dd><p>Return the details of estimator class in a dictonary, data will be serialized so that it can be written into JSON</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.MultipleRDMRegression">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zpyhelper.MVPA.estimators.</span></span><span class="sig-name descname"><span class="pre">MultipleRDMRegression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">activitypattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modelrdms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modelnames</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rdm_metric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'correlation'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">standardize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runonresidual</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">controlrdms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#MultipleRDMRegression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.MultipleRDMRegression" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#zpyhelper.MVPA.estimators.MetaEstimator" title="zpyhelper.MVPA.estimators.MetaEstimator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MetaEstimator</span></code></a></p>
+<p>estimate the regression coefficient when using the model rdms to predict neural rdm</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>activitypattern</strong> (<em>numpy.ndarray</em>) – a 2D numpy array. the neural activity pattern matrix used for computing representation dissimilarity matrix. size = (nsample,nfeatures)</p></li>
+<li><p><strong>modelrdms</strong> (<em>numpy.ndarray or list of numpy.ndarray</em>) – a 2D numpy array. the dissimilarity matrices from different models of representation. size = (nsample,nsample)</p></li>
+<li><p><strong>modelnames</strong> (<em>list, optional</em>) – a list of model names. If <cite>None</cite> models will be named as m1,m2,…, by default <cite>None</cite></p></li>
+<li><p><strong>rdm_metric</strong> (<em>str, optional</em>) – dissimilarity/distance metric passed to <cite>scipy.spatial.distance.pdist</cite> to compute neural rdm from activity pattern matrix, by default <cite>“correlation”</cite></p></li>
+<li><p><strong>standardize</strong> (<em>bool, optional</em>) – whether or not to standardize the model rdms and neural rdms before running regression, by default <cite>True</cite></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.MultipleRDMRegression.rdm_shape">
+<span class="sig-name descname"><span class="pre">rdm_shape</span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#MultipleRDMRegression.rdm_shape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.MultipleRDMRegression.rdm_shape" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.MultipleRDMRegression.modelnames">
+<span class="sig-name descname"><span class="pre">modelnames</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#MultipleRDMRegression.modelnames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.MultipleRDMRegression.modelnames" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.MultipleRDMRegression.n_reg">
+<span class="sig-name descname"><span class="pre">n_reg</span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#MultipleRDMRegression.n_reg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.MultipleRDMRegression.n_reg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.MultipleRDMRegression.X">
+<span class="sig-name descname"><span class="pre">X</span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#MultipleRDMRegression.X"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.MultipleRDMRegression.X" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.MultipleRDMRegression.Y">
+<span class="sig-name descname"><span class="pre">Y</span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#MultipleRDMRegression.Y"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.MultipleRDMRegression.Y" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.MultipleRDMRegression.standardize">
+<span class="sig-name descname"><span class="pre">standardize</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#MultipleRDMRegression.standardize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.MultipleRDMRegression.standardize" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.MultipleRDMRegression.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#MultipleRDMRegression.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.MultipleRDMRegression.fit" title="Link to this definition">¶</a></dt>
+<dd><p>Run estimator.
+After self.fit() is called, <cite>result</cite> attribute of the estimator will be set, it will be an 1D numpy array.</p>
+<p>Note that list-wise exclusion is used. The lower triangular part of the model rdm(s) and that of neural rdm are put into columns.
+If any one of the columns contains a NaN , the corresponding row is omitted.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.MultipleRDMRegression.visualize">
+<span class="sig-name descname"><span class="pre">visualize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">matplotlib.figure.Figure</span></span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#MultipleRDMRegression.visualize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.MultipleRDMRegression.visualize" title="Link to this definition">¶</a></dt>
+<dd><p>show the model rdm(s) and neural rdm in heatmap.</p>
+<p>Each subplot shows a model or neural rdm. The regression coefficient of model rdm is shown in subplot’s title.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>matplotlib.figure.Figure</em> – the handle of plotted figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.MultipleRDMRegression.__str__">
+<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#MultipleRDMRegression.__str__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.MultipleRDMRegression.__str__" title="Link to this definition">¶</a></dt>
+<dd><p>Return the name of estimator class</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.MultipleRDMRegression.get_details">
+<span class="sig-name descname"><span class="pre">get_details</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#MultipleRDMRegression.get_details"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.MultipleRDMRegression.get_details" title="Link to this definition">¶</a></dt>
+<dd><p>Return the details of estimator class in a dictonary, data will be serialized so that it can be written into JSON</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.NeuralRDMStability">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zpyhelper.MVPA.estimators.</span></span><span class="sig-name descname"><span class="pre">NeuralRDMStability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">activitypattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rdm_metric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'correlation'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'spearman'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ztransform</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#NeuralRDMStability"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.NeuralRDMStability" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#zpyhelper.MVPA.estimators.MetaEstimator" title="zpyhelper.MVPA.estimators.MetaEstimator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MetaEstimator</span></code></a></p>
+<p>calculate the stability of neural RDM across different splits of data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>activitypattern</strong> (<em>numpy.ndarray</em>) – a 2D numpy array. the neural activity pattern matrix used for computing representation dissimilarity matrix. size = (nsample,nfeatures)</p></li>
+<li><p><strong>groups</strong> (<em>numpy.ndarray</em>) – array specifying the which group each row of activitypattern belongs to. Must have at least two unique values.</p></li>
+<li><p><strong>rdm_metric</strong> (<em>str, optional</em>) – _dissimilarity/distance metric passed to <cite>scipy.spatial.distance.pdist</cite> to compute neural rdm from activity pattern matrix, by default <cite>“correlation”</cite></p></li>
+<li><p><strong>type</strong> (<em>str, optional</em>) – type of correlation measure, by default <cite>“spearman”</cite>.
+must be one of: <cite>“spearman”, “pearson”, “kendall”, “linreg”</cite></p></li>
+<li><p><strong>ztransform</strong> (<em>bool, optional</em>) – whether or not to perform fisher Z transform to the correlation coefficients, by default <cite>False</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – <code class="docutils literal notranslate"><span class="pre">groups</span></code> must have at least two unique values</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.NeuralRDMStability.Xs">
+<span class="sig-name descname"><span class="pre">Xs</span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#NeuralRDMStability.Xs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.NeuralRDMStability.Xs" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.NeuralRDMStability.RDMs">
+<span class="sig-name descname"><span class="pre">RDMs</span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#NeuralRDMStability.RDMs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.NeuralRDMStability.RDMs" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.NeuralRDMStability.groups">
+<span class="sig-name descname"><span class="pre">groups</span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#NeuralRDMStability.groups"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.NeuralRDMStability.groups" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.NeuralRDMStability.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#NeuralRDMStability.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.NeuralRDMStability.fit" title="Link to this definition">¶</a></dt>
+<dd><p>Run estimator.
+After self.fit() is called, <cite>result</cite> attribute of the estimator will be set, it will be an 1D numpy array.</p>
+<p>Neural RDM is calculated for each group. Correlation between every possible pair of groups are calculated. Then the average is taken over all the calculated correlation coefficients.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.NeuralRDMStability.__str__">
+<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#NeuralRDMStability.__str__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.NeuralRDMStability.__str__" title="Link to this definition">¶</a></dt>
+<dd><p>Return the name of estimator class</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.NeuralRDMStability.visualize">
+<span class="sig-name descname"><span class="pre">visualize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">matplotlib.figure.Figure</span></span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#NeuralRDMStability.visualize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.NeuralRDMStability.visualize" title="Link to this definition">¶</a></dt>
+<dd><p>show the neural rdm of different groups using heatmap.</p>
+<p>Each subplot shows the neural rdm of one group.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>matplotlib.figure.Figure</em> – the handle of plotted figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.NeuralRDMStability.get_details">
+<span class="sig-name descname"><span class="pre">get_details</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#NeuralRDMStability.get_details"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.NeuralRDMStability.get_details" title="Link to this definition">¶</a></dt>
+<dd><p>Return the details of estimator class in a dictonary, data will be serialized so that it can be written into JSON</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.PatternDecoding">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zpyhelper.MVPA.estimators.</span></span><span class="sig-name descname"><span class="pre">PatternDecoding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">activitypattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decoder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decoder_kwarg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targetnames</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regression</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scoring_func</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">callable</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scoring_funcname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#PatternDecoding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.PatternDecoding" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#zpyhelper.MVPA.estimators.MetaEstimator" title="zpyhelper.MVPA.estimators.MetaEstimator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MetaEstimator</span></code></a></p>
+<p>decode from neural activity pattern with cross validation
+Important note: this hasn’t been tested in whole-brain searchlight yet</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>activitypattern</strong> (<em>numpy.ndarray</em>) – a 2D numpy array of size <cite>(nsample,nfeature)</cite>. the neural activity pattern matrix used for decoding.</p></li>
+<li><p><strong>targets</strong> (<em>numpy.ndarray</em>) – a 2D or 1D numpy array of size <cite>(nsample,ntarget)</cite> or <cite>(nsample,)</cite>.  Target values for prediction (class labels in classification, real numbers in regression).</p></li>
+<li><p><strong>groups</strong> (<em>numpy.ndarray</em>) – a 1D numpy array of size <cite>(nsample,)</cite>. Group values used for splitting data into decoder fitting and evaluation set. Must have at least two unique values</p></li>
+<li><p><strong>decoder</strong> (str or an estimator object implementing decoding analysis with <cite>fit</cite> and <cite>predict</cite>) – decoder used to perform the analysis</p></li>
+<li><p><strong>decoder_kwarg</strong> (<em>dict</em>) – arguments passed to decoder class to instantiate a decoder</p></li>
+<li><p><strong>regression</strong> (<em>bool</em>) – regression or classification decoder. If <code class="docutils literal notranslate"><span class="pre">True</span></code>, will find in regression decoders, if <code class="docutils literal notranslate"><span class="pre">False</span></code>, will find in classification decoders. by default <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>targetnames</strong> (<em>list, optional</em>) – a list of model names. If <cite>None</cite> models will be named as m1,m2,…, by default <cite>None</cite></p></li>
+<li><p><strong>scoring_func</strong> (<em>str or callable, optional</em>) – a scoring function that will be used to compute the quality of prediction after fitting the decoder. If None, will use accuracy score for classification and use r_square for regression.</p></li>
+<li><p><strong>scoring_funcname</strong> (<em>str, optional</em>) – name of the scoring function if an customised callable is passed in <cite>scoring_funcname</cite></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.PatternDecoding.multioutput">
+<span class="sig-name descname"><span class="pre">multioutput</span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#PatternDecoding.multioutput"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.PatternDecoding.multioutput" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.PatternDecoding.targetnames">
+<span class="sig-name descname"><span class="pre">targetnames</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#PatternDecoding.targetnames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.PatternDecoding.targetnames" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.PatternDecoding.basedecoder">
+<span class="sig-name descname"><span class="pre">basedecoder</span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#PatternDecoding.basedecoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.PatternDecoding.basedecoder" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.PatternDecoding.decoder_kwarg">
+<span class="sig-name descname"><span class="pre">decoder_kwarg</span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#PatternDecoding.decoder_kwarg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.PatternDecoding.decoder_kwarg" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.PatternDecoding.score">
+<span class="sig-name descname"><span class="pre">score</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#PatternDecoding.score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.PatternDecoding.score" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.PatternDecoding.scorename">
+<span class="sig-name descname"><span class="pre">scorename</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#PatternDecoding.scorename"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.PatternDecoding.scorename" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.PatternDecoding.X">
+<span class="sig-name descname"><span class="pre">X</span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#PatternDecoding.X"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.PatternDecoding.X" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.PatternDecoding.Y">
+<span class="sig-name descname"><span class="pre">Y</span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#PatternDecoding.Y"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.PatternDecoding.Y" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.PatternDecoding.groups">
+<span class="sig-name descname"><span class="pre">groups</span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#PatternDecoding.groups"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.PatternDecoding.groups" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.PatternDecoding.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#PatternDecoding.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.PatternDecoding.fit" title="Link to this definition">¶</a></dt>
+<dd><p>Run estimator.
+After self.fit() is called, <cite>result</cite> attribute of the estimator will be set, it will be an 1D numpy array.</p>
+<p>Run decoding in cross-validation. data is splitted according to <cite>self.groups</cite>. Leave-one-group-out cross-validation is used. The result saved is [average fit score, average cv evaluation score]</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.PatternDecoding.visualize">
+<span class="sig-name descname"><span class="pre">visualize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">matplotlib.figure.Figure</span></span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#PatternDecoding.visualize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.PatternDecoding.visualize" title="Link to this definition">¶</a></dt>
+<dd><p>show the score of the decoder in fit and evaliatopm set using scatter plots</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>matplotlib.figure.Figure</em> – the handle of plotted figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.PatternDecoding.__str__">
+<span class="sig-name descname"><span class="pre">__str__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#PatternDecoding.__str__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.PatternDecoding.__str__" title="Link to this definition">¶</a></dt>
+<dd><p>Return the name of estimator class</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.estimators.PatternDecoding.get_details">
+<span class="sig-name descname"><span class="pre">get_details</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/estimators.html#PatternDecoding.get_details"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.estimators.PatternDecoding.get_details" title="Link to this definition">¶</a></dt>
+<dd><p>Return the details of estimator class in a dictonary, data will be serialized so that it can be written into JSON</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../index.html">zpyhelper</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../_autosummary/zpyhelper.html">zpyhelper</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html">zpyhelper</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="../index.html">zpyhelper.MVPA</a><ul class="current">
+<li class="toctree-l5 current"><a class="reference internal" href="../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l6 current"><a class="current reference internal" href="#">zpyhelper.MVPA.estimators</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#functions">Functions</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li class="toctree-l8"><a class="reference internal" href="#zpyhelper.MVPA.estimators._force_1d"><code class="docutils literal notranslate"><span class="pre">_force_1d()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#zpyhelper.MVPA.estimators.MetaEstimator"><code class="docutils literal notranslate"><span class="pre">MetaEstimator</span></code></a><ul>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.MetaEstimator.fit"><code class="docutils literal notranslate"><span class="pre">MetaEstimator.fit()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.MetaEstimator.__str__"><code class="docutils literal notranslate"><span class="pre">MetaEstimator.__str__()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.MetaEstimator.get_details"><code class="docutils literal notranslate"><span class="pre">MetaEstimator.get_details()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="#zpyhelper.MVPA.estimators.PatternCorrelation"><code class="docutils literal notranslate"><span class="pre">PatternCorrelation</span></code></a><ul>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.PatternCorrelation.rdm_shape"><code class="docutils literal notranslate"><span class="pre">PatternCorrelation.rdm_shape</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.PatternCorrelation.Xs"><code class="docutils literal notranslate"><span class="pre">PatternCorrelation.Xs</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.PatternCorrelation.modelnames"><code class="docutils literal notranslate"><span class="pre">PatternCorrelation.modelnames</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.PatternCorrelation.nX"><code class="docutils literal notranslate"><span class="pre">PatternCorrelation.nX</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.PatternCorrelation.fit"><code class="docutils literal notranslate"><span class="pre">PatternCorrelation.fit()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.PatternCorrelation.visualize"><code class="docutils literal notranslate"><span class="pre">PatternCorrelation.visualize()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.PatternCorrelation.__str__"><code class="docutils literal notranslate"><span class="pre">PatternCorrelation.__str__()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.PatternCorrelation.get_details"><code class="docutils literal notranslate"><span class="pre">PatternCorrelation.get_details()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="#zpyhelper.MVPA.estimators.MultipleRDMRegression"><code class="docutils literal notranslate"><span class="pre">MultipleRDMRegression</span></code></a><ul>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.MultipleRDMRegression.rdm_shape"><code class="docutils literal notranslate"><span class="pre">MultipleRDMRegression.rdm_shape</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.MultipleRDMRegression.modelnames"><code class="docutils literal notranslate"><span class="pre">MultipleRDMRegression.modelnames</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.MultipleRDMRegression.n_reg"><code class="docutils literal notranslate"><span class="pre">MultipleRDMRegression.n_reg</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.MultipleRDMRegression.X"><code class="docutils literal notranslate"><span class="pre">MultipleRDMRegression.X</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.MultipleRDMRegression.Y"><code class="docutils literal notranslate"><span class="pre">MultipleRDMRegression.Y</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.MultipleRDMRegression.standardize"><code class="docutils literal notranslate"><span class="pre">MultipleRDMRegression.standardize</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.MultipleRDMRegression.fit"><code class="docutils literal notranslate"><span class="pre">MultipleRDMRegression.fit()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.MultipleRDMRegression.visualize"><code class="docutils literal notranslate"><span class="pre">MultipleRDMRegression.visualize()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.MultipleRDMRegression.__str__"><code class="docutils literal notranslate"><span class="pre">MultipleRDMRegression.__str__()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.MultipleRDMRegression.get_details"><code class="docutils literal notranslate"><span class="pre">MultipleRDMRegression.get_details()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="#zpyhelper.MVPA.estimators.NeuralRDMStability"><code class="docutils literal notranslate"><span class="pre">NeuralRDMStability</span></code></a><ul>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.NeuralRDMStability.Xs"><code class="docutils literal notranslate"><span class="pre">NeuralRDMStability.Xs</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.NeuralRDMStability.RDMs"><code class="docutils literal notranslate"><span class="pre">NeuralRDMStability.RDMs</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.NeuralRDMStability.groups"><code class="docutils literal notranslate"><span class="pre">NeuralRDMStability.groups</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.NeuralRDMStability.fit"><code class="docutils literal notranslate"><span class="pre">NeuralRDMStability.fit()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.NeuralRDMStability.__str__"><code class="docutils literal notranslate"><span class="pre">NeuralRDMStability.__str__()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.NeuralRDMStability.visualize"><code class="docutils literal notranslate"><span class="pre">NeuralRDMStability.visualize()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.NeuralRDMStability.get_details"><code class="docutils literal notranslate"><span class="pre">NeuralRDMStability.get_details()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l8"><a class="reference internal" href="#zpyhelper.MVPA.estimators.PatternDecoding"><code class="docutils literal notranslate"><span class="pre">PatternDecoding</span></code></a><ul>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.PatternDecoding.multioutput"><code class="docutils literal notranslate"><span class="pre">PatternDecoding.multioutput</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.PatternDecoding.targetnames"><code class="docutils literal notranslate"><span class="pre">PatternDecoding.targetnames</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.PatternDecoding.basedecoder"><code class="docutils literal notranslate"><span class="pre">PatternDecoding.basedecoder</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.PatternDecoding.decoder_kwarg"><code class="docutils literal notranslate"><span class="pre">PatternDecoding.decoder_kwarg</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.PatternDecoding.score"><code class="docutils literal notranslate"><span class="pre">PatternDecoding.score</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.PatternDecoding.scorename"><code class="docutils literal notranslate"><span class="pre">PatternDecoding.scorename</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.PatternDecoding.X"><code class="docutils literal notranslate"><span class="pre">PatternDecoding.X</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.PatternDecoding.Y"><code class="docutils literal notranslate"><span class="pre">PatternDecoding.Y</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.PatternDecoding.groups"><code class="docutils literal notranslate"><span class="pre">PatternDecoding.groups</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.PatternDecoding.fit"><code class="docutils literal notranslate"><span class="pre">PatternDecoding.fit()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.PatternDecoding.visualize"><code class="docutils literal notranslate"><span class="pre">PatternDecoding.visualize()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.PatternDecoding.__str__"><code class="docutils literal notranslate"><span class="pre">PatternDecoding.__str__()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.MVPA.estimators.PatternDecoding.get_details"><code class="docutils literal notranslate"><span class="pre">PatternDecoding.get_details()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="../preprocessors/index.html">zpyhelper.MVPA.preprocessors</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../rdm/index.html">zpyhelper.MVPA.rdm</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../filesys/index.html">zpyhelper.filesys</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../image/index.html">zpyhelper.image</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">API Reference</a><ul>
+  <li><a href="../../index.html">zpyhelper</a><ul>
+  <li><a href="../index.html">zpyhelper.MVPA</a><ul>
+      <li>Previous: <a href="../index.html" title="previous chapter">zpyhelper.MVPA</a></li>
+      <li>Next: <a href="../preprocessors/index.html" title="next chapter">zpyhelper.MVPA.preprocessors</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Zilu Liang.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../../../_sources/autoapi/zpyhelper/MVPA/estimators/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

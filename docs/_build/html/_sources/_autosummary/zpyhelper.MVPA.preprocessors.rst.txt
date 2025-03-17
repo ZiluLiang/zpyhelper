@@ -1,13 +1,8 @@
-zpyhelper.MVPA.preprocessors
+﻿zpyhelper.MVPA.preprocessors
 ============================
 
 .. automodule:: zpyhelper.MVPA.preprocessors
 
-   
-   
-   
-
-   
    
    .. rubric:: Functions
 
@@ -18,19 +13,9 @@ zpyhelper.MVPA.preprocessors
       chain_steps
       concat_data
       extract_pc
+      kabsch_algorithm
       normalise_multivariate_noise
+      rmsd
       scale_feature
       split_data
    
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-

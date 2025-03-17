@@ -287,8 +287,11 @@ def kabsch_algorithm(P:numpy.ndarray,Q:numpy.ndarray, translation:bool=False)->t
 
     Returns
     -------
-    tuple
-        _description_
+    a tuple of (Phat, R, rmsd)\n
+        Phat is the rotated P. \n
+        R is the estimated rotation matrix\n
+        The rmsd between the rotated P and Q \n
+
     """
 
     #check the dimensionality of the input matrices

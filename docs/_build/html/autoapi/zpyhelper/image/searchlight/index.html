@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>zpyhelper.image.searchlight &#8212; zpyhelper  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+    <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="prev" title="zpyhelper.image.niidatahandler" href="../niidatahandler/index.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-zpyhelper.image.searchlight">
+<span id="zpyhelper-image-searchlight"></span><h1>zpyhelper.image.searchlight<a class="headerlink" href="#module-zpyhelper.image.searchlight" title="Link to this heading">¶</a></h1>
+<p>This module contains classes for running searchlight MVPA analysis in nifti images.
+The code is adapted from nilearn.decoding.searchlight module &#64; <a class="reference external" href="https://github.com/nilearn/nilearn/blob/321494420/nilearn/decoding/searchlight.py">https://github.com/nilearn/nilearn/blob/321494420/nilearn/decoding/searchlight.py</a></p>
+<section id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#zpyhelper.image.searchlight.MVPASearchLight" title="zpyhelper.image.searchlight.MVPASearchLight"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MVPASearchLight</span></code></a></p></td>
+<td><p>Class for running searchlight analysis. Once instantiated, can be used to run multiple searchlight analyses.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#zpyhelper.image.searchlight._apply_mask_and_get_affinity" title="zpyhelper.image.searchlight._apply_mask_and_get_affinity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_apply_mask_and_get_affinity</span></code></a>(seeds, niimgs[, radius, ...])</p></td>
+<td><p>This function is adapted from <cite>_apply_mask_and_get_affinity</cite> from the <cite>nilearn.maskers.nifti_spheres_masker</cite> module</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="zpyhelper.image.searchlight._apply_mask_and_get_affinity">
+<span class="sig-prename descclassname"><span class="pre">zpyhelper.image.searchlight.</span></span><span class="sig-name descname"><span class="pre">_apply_mask_and_get_affinity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seeds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">niimgs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_img</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">empty_policy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'ignore'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_vox</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_overlap</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">cpu_count()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zpyhelper/image/searchlight.html#_apply_mask_and_get_affinity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.image.searchlight._apply_mask_and_get_affinity" title="Link to this definition">¶</a></dt>
+<dd><p>This function is adapted from <cite>_apply_mask_and_get_affinity</cite> from the <cite>nilearn.maskers.nifti_spheres_masker</cite> module
+(<a class="reference external" href="https://github.com/nilearn/nilearn/blob/0d379462d8f84344056308d4d096caf78954ca6d/nilearn/input_data/nifti_spheres_masker.py">https://github.com/nilearn/nilearn/blob/0d379462d8f84344056308d4d096caf78954ca6d/nilearn/input_data/nifti_spheres_masker.py</a>)</p>
+<p class="rubric">Original Documentation</p>
+<p>Get only the rows which are occupied by sphere at given seed locations and the provided radius.
+Rows are in target_affine and target_shape space.</p>
+<p class="rubric">Adaptation</p>
+<p>This function is adapted to:</p>
+<p>1. impose minimum voxel number contraints and avoid throwing warnings when an empty sphere/insufficient voxel number is detected.
+The current script handle empty sphere or sphere with insufficient voxel number using one of the three approaches by specifying <cite>empty_policy</cite> argument:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">'fill'</span></code>: conduct new search with the same algorithm but incrementing searchlight sphere radius for empty spheres</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'ignore'</span></code>: return empty</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'raise'</span></code>: throw an error</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="2">
+<li><p>add parallelization to speed up the process</p></li>
+<li><p>extract from multiple nii img. This will be handy when estimating whitening matrix for each sphere from residual images of the first level GLM.</p></li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seeds</strong> (<em>List of triplets of coordinates in native space</em>) – Seed definitions. List of coordinates of the seeds in the same space
+as target_affine.</p></li>
+<li><p><strong>niimgs</strong> (<em>a list of or one 3D/4D Niimg-like object</em>) – See <span class="xref std std-ref">extracting_data</span>.
+Images to process.
+If a 3D niimg is provided, a singleton dimension will be added to
+the output to represent the single scan in the niimg.</p></li>
+<li><p><strong>radius</strong> (<em>float</em>) – Indicates, in millimeters, the radius for the sphere around the seed.  By default <cite>5</cite>.</p></li>
+<li><p><strong>mask_img</strong> (<em>Niimg-like object, optional</em>) – Mask to apply to regions before extracting signals. If niimg is None,
+mask_img is used as a reference space in which the spheres ‘indices are
+placed. By default <cite>None</cite>.</p></li>
+<li><p><strong>empty_policy</strong> (<em>str, optional</em>) – how to deal with empty spheres</p></li>
+<li><p><strong>n_vox</strong> (<em>int, optional</em>) – minimum number of voxels in each searchlight sphere. By default <cite>2</cite>.</p></li>
+<li><p><strong>allow_overlap</strong> (<em>boolean</em>) – If False, a ValueError is raised if VOIs overlap. By default <cite>True</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>X</strong> (<em>2D numpy.ndarray</em>) – Signal for each brain voxel in the (masked) niimgs.
+shape: (number of scans, number of voxels)</p></li>
+<li><p><strong>A</strong> (<em>scipy.sparse.lil_matrix</em>) – Contains the boolean indices for each sphere.
+shape: (number of seeds, number of voxels)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="zpyhelper.image.searchlight.MVPASearchLight">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">zpyhelper.image.searchlight.</span></span><span class="sig-name descname"><span class="pre">MVPASearchLight</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">patternimg_paths</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_img_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residimg_paths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">process_mask_img_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">12.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preproc_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">njobs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zpyhelper/image/searchlight.html#MVPASearchLight"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.image.searchlight.MVPASearchLight" title="Link to this definition">¶</a></dt>
+<dd><p>Class for running searchlight analysis. Once instantiated, can be used to run multiple searchlight analyses.</p>
+<p class="rubric">Example</p>
+<p>For example, the following code instantiates a searchlight instance, and then runs a regression searchlight and then a decoding searchlight.
+<code class="docutils literal notranslate"><span class="pre">`</span>
+<span class="pre">SearchLight</span> <span class="pre">=</span> <span class="pre">MVPASearchLight(patternimg_paths,</span> <span class="pre">mask_img_path,</span> <span class="pre">residimg_paths,</span> <span class="pre">process_mask_img_path,</span> <span class="pre">radius,</span> <span class="pre">preproc_steps,</span> <span class="pre">njobs)</span>
+<span class="pre">subSearchLight.run(estimator</span> <span class="pre">=</span> <span class="pre">MultipleRDMRegression,</span> <span class="pre">estimator_kwargs</span> <span class="pre">=</span> <span class="pre">regression_kwargs,</span> <span class="pre">outputpath</span> <span class="pre">=</span> <span class="pre">somepath,</span>&#160; <span class="pre">outputregexp</span> <span class="pre">=</span> <span class="pre">'beta_%04d.nii')</span>
+<span class="pre">subSearchLight.run(estimator</span> <span class="pre">=</span> <span class="pre">PatternDecoding,</span> <span class="pre">estimator_kwargs</span> <span class="pre">=</span> <span class="pre">decoding_kwargs,</span> <span class="pre">outputpath</span> <span class="pre">=</span> <span class="pre">somepath,</span>&#160; <span class="pre">outputregexp</span> <span class="pre">=</span> <span class="pre">'acc_%04d.nii')</span>
+<span class="pre">`</span></code></p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul>
+<li><p><strong>patternimg_paths</strong> (<em>str or list</em>) – path to the activity pattern images. It can be path to a 4D image or paths to multiple 3D images.</p></li>
+<li><p><strong>mask_img_path</strong> (<em>str</em>) – path to the mask image. The mask image is a boolean image specifying voxels whose signals should be included into computation (of neural rdm etc)</p></li>
+<li><p><strong>residimg_paths</strong> (<em>str or list</em>) – path to the residual images. It can be path to a 4D image or paths to multiple 3D images. It will be used if multivariate noise normalization is required</p></li>
+<li><p><strong>process_mask_img_path</strong> (<em>str, optional</em>) – path to the process mask image. The process mask image is a boolean image specifying voxels on which searchlight analysis is performed. If None, will use the mask_img_path by default None</p></li>
+<li><p><strong>radius</strong> (<em>float, optional</em>) – the radius of the searchlight sphere, by default 12.5</p></li>
+<li><p><strong>preproc_steps</strong> (<em>dict, optional</em>) – preprocesss steps applied to the activity pattern matrix before calling estimator</p>
+<p>for example:</p>
+<p><a href="#id1"><span class="problematic" id="id2">``</span></a>`
+preproc_steps = {</p>
+<blockquote>
+<div><dl>
+<dt>“MVNN”: [normalise_multivariate_noise,</dt><dd><blockquote>
+<div><p>{“ap_groups”:apgroup,”resid_groups”:rsgroup}</p>
+</div></blockquote>
+<p>],</p>
+</dd>
+</dl>
+<p>“PCA”: [extract_pc,{“n_components”:3}],
+“AOE”: [average_odd_even_session,{“session”:session}],
+}</p>
+</div></blockquote>
+<p><a href="#id3"><span class="problematic" id="id4">``</span></a><a href="#id5"><span class="problematic" id="id6">`</span></a></p>
+</li>
+<li><p><strong>njobs</strong> (<em>int, optional</em>) – number of parallel jobs, by default 1</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.image.searchlight.MVPASearchLight.pattern_img">
+<span class="sig-name descname"><span class="pre">pattern_img</span></span><a class="reference internal" href="../../../../_modules/zpyhelper/image/searchlight.html#MVPASearchLight.pattern_img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.image.searchlight.MVPASearchLight.pattern_img" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.image.searchlight.MVPASearchLight.mask_img">
+<span class="sig-name descname"><span class="pre">mask_img</span></span><a class="reference internal" href="../../../../_modules/zpyhelper/image/searchlight.html#MVPASearchLight.mask_img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.image.searchlight.MVPASearchLight.mask_img" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.image.searchlight.MVPASearchLight.process_mask_img">
+<span class="sig-name descname"><span class="pre">process_mask_img</span></span><a class="reference internal" href="../../../../_modules/zpyhelper/image/searchlight.html#MVPASearchLight.process_mask_img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.image.searchlight.MVPASearchLight.process_mask_img" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.image.searchlight.MVPASearchLight.radius">
+<span class="sig-name descname"><span class="pre">radius</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">12.5</span></em><a class="reference internal" href="../../../../_modules/zpyhelper/image/searchlight.html#MVPASearchLight.radius"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.image.searchlight.MVPASearchLight.radius" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.image.searchlight.MVPASearchLight.njobs">
+<span class="sig-name descname"><span class="pre">njobs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="reference internal" href="../../../../_modules/zpyhelper/image/searchlight.html#MVPASearchLight.njobs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.image.searchlight.MVPASearchLight.njobs" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.image.searchlight.MVPASearchLight.preproc_steps">
+<span class="sig-name descname"><span class="pre">preproc_steps</span></span><a class="reference internal" href="../../../../_modules/zpyhelper/image/searchlight.html#MVPASearchLight.preproc_steps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.image.searchlight.MVPASearchLight.preproc_steps" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="zpyhelper.image.searchlight.MVPASearchLight.config">
+<span class="sig-name descname"><span class="pre">config</span></span><a class="reference internal" href="../../../../_modules/zpyhelper/image/searchlight.html#MVPASearchLight.config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.image.searchlight.MVPASearchLight.config" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zpyhelper.image.searchlight.MVPASearchLight.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">estimator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimator_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputpath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputregexp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'beta_%04d.nii'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zpyhelper/image/searchlight.html#MVPASearchLight.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.image.searchlight.MVPASearchLight.run" title="Link to this definition">¶</a></dt>
+<dd><p>run searchlight analysis and save results.</p>
+<p>Whole brain searchlight spheres are split into <cite>self.jobs</cite> number of chunks and the searchlight for these chunks are performed in parallel.</p>
+<p>In each searchlight sphere, its neural activity pattern as well as the <cite>estimator_kwargs</cite> are passed to <cite>estimator</cite> to instantiate an estimator class for running the analysis</p>
+<p>After all jobs are done, results are written into a nii file and saved to the output directory</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>estimator</strong> (<em>class</em>) – an estimator class that is called to perform rsa analysis in each sphere</p></li>
+<li><p><strong>estimator_kwargs</strong> (<em>dict</em>) – other arguments passed to instantiate an estimator class in each sphere</p></li>
+<li><p><strong>outputpath</strong> (<em>str</em>) – output directory, results will be written to a nii file and saved to this directory</p></li>
+<li><p><strong>outputregexp</strong> (<em>str</em>) – regular expression that is used to contruct output nii file name.  by default “beta_%04d.nii”</p></li>
+<li><p><strong>verbose</strong> (<em>bool, optional</em>) – display progress or not, by default True</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zpyhelper.image.searchlight.MVPASearchLight.write">
+<span class="sig-name descname"><span class="pre">write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimator_details</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputpath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputregexp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ensure_finite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zpyhelper/image/searchlight.html#MVPASearchLight.write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.image.searchlight.MVPASearchLight.write" title="Link to this definition">¶</a></dt>
+<dd><p>write result to nii file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>result</strong> (<em>numpy.ndarray</em>) – result to write</p></li>
+<li><p><strong>estimator_details</strong> (<em>str</em>) – description of estimator details</p></li>
+<li><p><strong>outputpath</strong> (<em>str</em>) – directory to save the nii file</p></li>
+<li><p><strong>outputregexp</strong> (<em>str</em>) – regular expression used to name the nii file</p></li>
+<li><p><strong>ensure_finite</strong> (<em>bool, optional</em>) – whether or not to replace nans. If <cite>True</cite>, nans will be saved as zero. If <cite>False</cite>, will keep as nan. by default False, by default False</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zpyhelper.image.searchlight.MVPASearchLight.fitPatchGroup">
+<span class="sig-name descname"><span class="pre">fitPatchGroup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">neighbour_idx_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thread_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimator_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zpyhelper/image/searchlight.html#MVPASearchLight.fitPatchGroup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.image.searchlight.MVPASearchLight.fitPatchGroup" title="Link to this definition">¶</a></dt>
+<dd><p>run analysis in a group of searchlight patches</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>neighbour_idx_list</strong> (<em>list</em>) – a list of indices of voxels that should be included in each searchlight sphere</p></li>
+<li><p><strong>thread_id</strong> (<em>int</em>) – thread id for the current job, used for display</p></li>
+<li><p><strong>total</strong> (<em>int</em>) – total number of voxels to perform searchlight on across all jobs</p></li>
+<li><p><strong>estimator_kwargs</strong> (<em>dict</em>) – _other arguments passed to instantiate an estimator class in each sphere</p></li>
+<li><p><strong>verbose</strong> (<em>bool, optional</em>) – display progress or not, by default True</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>result</strong> (<em>numpy.array</em>) – searchlight results for the list of voxels</p></li>
+<li><p><strong>estimator_details</strong> (<em>dict</em>) – details of estimator returned by the estimator class. values in the dictionary should be serialized and ready to be written in to json format.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="zpyhelper.image.searchlight.MVPASearchLight.genPatches">
+<span class="sig-name descname"><span class="pre">genPatches</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zpyhelper/image/searchlight.html#MVPASearchLight.genPatches"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.image.searchlight.MVPASearchLight.genPatches" title="Link to this definition">¶</a></dt>
+<dd><p>generate “patches” of searchlight:</p>
+<p>extract wholebrain activity pattern matrix and find indices of voxels that should be included in each searchlight sphere</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../index.html">zpyhelper</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../_autosummary/zpyhelper.html">zpyhelper</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html">zpyhelper</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../MVPA/index.html">zpyhelper.MVPA</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../filesys/index.html">zpyhelper.filesys</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../index.html">zpyhelper.image</a><ul class="current">
+<li class="toctree-l5 current"><a class="reference internal" href="../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l6"><a class="reference internal" href="../niidatahandler/index.html">zpyhelper.image.niidatahandler</a></li>
+<li class="toctree-l6 current"><a class="current reference internal" href="#">zpyhelper.image.searchlight</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#classes">Classes</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#functions">Functions</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li class="toctree-l8"><a class="reference internal" href="#zpyhelper.image.searchlight._apply_mask_and_get_affinity"><code class="docutils literal notranslate"><span class="pre">_apply_mask_and_get_affinity()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#zpyhelper.image.searchlight.MVPASearchLight"><code class="docutils literal notranslate"><span class="pre">MVPASearchLight</span></code></a><ul>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.image.searchlight.MVPASearchLight.pattern_img"><code class="docutils literal notranslate"><span class="pre">MVPASearchLight.pattern_img</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.image.searchlight.MVPASearchLight.mask_img"><code class="docutils literal notranslate"><span class="pre">MVPASearchLight.mask_img</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.image.searchlight.MVPASearchLight.process_mask_img"><code class="docutils literal notranslate"><span class="pre">MVPASearchLight.process_mask_img</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.image.searchlight.MVPASearchLight.radius"><code class="docutils literal notranslate"><span class="pre">MVPASearchLight.radius</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.image.searchlight.MVPASearchLight.njobs"><code class="docutils literal notranslate"><span class="pre">MVPASearchLight.njobs</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.image.searchlight.MVPASearchLight.preproc_steps"><code class="docutils literal notranslate"><span class="pre">MVPASearchLight.preproc_steps</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.image.searchlight.MVPASearchLight.config"><code class="docutils literal notranslate"><span class="pre">MVPASearchLight.config</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.image.searchlight.MVPASearchLight.run"><code class="docutils literal notranslate"><span class="pre">MVPASearchLight.run()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.image.searchlight.MVPASearchLight.write"><code class="docutils literal notranslate"><span class="pre">MVPASearchLight.write()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.image.searchlight.MVPASearchLight.fitPatchGroup"><code class="docutils literal notranslate"><span class="pre">MVPASearchLight.fitPatchGroup()</span></code></a></li>
+<li class="toctree-l9"><a class="reference internal" href="#zpyhelper.image.searchlight.MVPASearchLight.genPatches"><code class="docutils literal notranslate"><span class="pre">MVPASearchLight.genPatches()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">API Reference</a><ul>
+  <li><a href="../../index.html">zpyhelper</a><ul>
+  <li><a href="../index.html">zpyhelper.image</a><ul>
+      <li>Previous: <a href="../niidatahandler/index.html" title="previous chapter">zpyhelper.image.niidatahandler</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Zilu Liang.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../../../_sources/autoapi/zpyhelper/image/searchlight/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

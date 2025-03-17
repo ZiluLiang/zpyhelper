@@ -1,0 +1,793 @@
+zpyhelper.MVPA.estimators
+=========================
+
+.. py:module:: zpyhelper.MVPA.estimators
+
+.. autoapi-nested-parse::
+
+   Estimator classes for MVPA analysis
+   All classes takes activity pattern matrix as an input and performs different types of RSA analysis based on the activity pattern matrix.
+
+   An estimator class has at least three methods:
+
+   (1) fit: by calling estimator.fit(), analysis is performed, `result` attribute of the estimator will be set, it will be an 1D numpy array.
+
+   (2) __str__: return the name of estimator class
+
+   (3) get_details: return the details of estimator class in a dictonary, data will be serialized so that it can be written into JSON
+
+   Some estimator also comes with a plotting method:
+
+   (4) visualize: by calling estimator.visualize(), the result of RSA analysis will visualized, a figure handle will be returned
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   zpyhelper.MVPA.estimators.MetaEstimator
+   zpyhelper.MVPA.estimators.PatternCorrelation
+   zpyhelper.MVPA.estimators.MultipleRDMRegression
+   zpyhelper.MVPA.estimators.NeuralRDMStability
+   zpyhelper.MVPA.estimators.PatternDecoding
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   zpyhelper.MVPA.estimators._force_1d
+
+
+Module Contents
+---------------
+
+.. py:function:: _force_1d(x)
+
+   
+   force array to be 1D
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: MetaEstimator
+
+   
+   Meta class for estimators
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. py:method:: fit()
+      :abstractmethod:
+
+
+      
+      Run estimator.
+      After self.fit() is called, `result` attribute of the estimator will be set, it will be an 1D numpy array.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: __str__()
+      :abstractmethod:
+
+
+      
+      Return the name of estimator class
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: get_details()
+      :abstractmethod:
+
+
+      
+      Return the details of estimator class in a dictonary, data will be serialized so that it can be written into JSON
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: PatternCorrelation(activitypattern: numpy.ndarray, modelrdms: Union[numpy.ndarray, list], modelnames: list = None, rdm_metric: str = 'correlation', type: str = 'spearman', ztransform: bool = False, runonresidual: bool = False, controlrdms: Union[numpy.ndarray, list] = [])
+
+   Bases: :py:obj:`MetaEstimator`
+
+
+   
+   Calculate the correlation between neural rdm and model rdm
+
+   :Parameters: * **activitypattern** (*numpy.ndarray*) -- a 2D numpy array. the neural activity pattern matrix used for computing representation dissimilarity matrix. size = (nsample,nfeatures)
+                * **modelrdm** (*numpy.ndarray or list of numpy.ndarray*) -- a 2D numpy array. the dissimilarity matrices from different models of representation. size = (nsample,nsample)
+                * **modelnames** (*list*) -- a list of model names. If `None` models will be named as `m1,m2,...`, by default `None`
+                * **rdm_metric** (*str, optional*) -- dissimilarity/distance metric passed to `scipy.spatial.distance.pdist` to compute neural rdm from activity pattern matrix, by default `"correlation"`
+                * **type** (*str, optional*) -- type of correlation measure, by default `"spearman"`.
+                  must be one of: `"spearman", "pearson", "kendall", "linreg"`
+                * **ztransform** (*bool, optional*) -- whether or not to perform fisher Z transform to the correlation coefficients, by default `False`.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. py:attribute:: rdm_shape
+
+
+   .. py:attribute:: Xs
+      :value: []
+
+
+
+   .. py:attribute:: modelnames
+      :value: None
+
+
+
+   .. py:attribute:: nX
+
+
+   .. py:method:: fit()
+
+      
+      Run estimator.
+      After self.fit() is called, `result` attribute of the estimator will be set, it will be an 1D numpy array.
+
+      Note that pairwise exclusion is used. For each model, the lower triangular part of the model rdm and that of neural rdm are put into two columns.
+      If one of the two columns contains a NaN , the corresponding row is omitted. This process is done separately for each model rdm when calculating correlation between that particular model rdm and neural rdm
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: visualize() -> matplotlib.figure.Figure
+
+      
+      show the model rdm(s) and neural rdm in heatmap.
+
+      Each subplot shows a model or neural rdm. The correlation between neural and model rdm is shown in subplot's title.
+
+      :returns: *matplotlib.figure.Figure* -- the handle of plotted figure
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: __str__() -> str
+
+      
+      Return the name of estimator class
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: get_details()
+
+      
+      Return the details of estimator class in a dictonary, data will be serialized so that it can be written into JSON
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: MultipleRDMRegression(activitypattern: numpy.ndarray, modelrdms: Union[numpy.ndarray, list], modelnames: list = None, rdm_metric: str = 'correlation', standardize: bool = True, runonresidual: bool = False, controlrdms: Union[numpy.ndarray, list] = [])
+
+   Bases: :py:obj:`MetaEstimator`
+
+
+   
+   estimate the regression coefficient when using the model rdms to predict neural rdm
+
+   :Parameters: * **activitypattern** (*numpy.ndarray*) -- a 2D numpy array. the neural activity pattern matrix used for computing representation dissimilarity matrix. size = (nsample,nfeatures)
+                * **modelrdms** (*numpy.ndarray or list of numpy.ndarray*) -- a 2D numpy array. the dissimilarity matrices from different models of representation. size = (nsample,nsample)
+                * **modelnames** (*list, optional*) -- a list of model names. If `None` models will be named as m1,m2,..., by default `None`
+                * **rdm_metric** (*str, optional*) -- dissimilarity/distance metric passed to `scipy.spatial.distance.pdist` to compute neural rdm from activity pattern matrix, by default `"correlation"`
+                * **standardize** (*bool, optional*) -- whether or not to standardize the model rdms and neural rdms before running regression, by default `True`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. py:attribute:: rdm_shape
+
+
+   .. py:attribute:: modelnames
+      :value: None
+
+
+
+   .. py:attribute:: n_reg
+
+
+   .. py:attribute:: X
+
+
+   .. py:attribute:: Y
+
+
+   .. py:attribute:: standardize
+      :value: True
+
+
+
+   .. py:method:: fit()
+
+      
+      Run estimator.
+      After self.fit() is called, `result` attribute of the estimator will be set, it will be an 1D numpy array.
+
+      Note that list-wise exclusion is used. The lower triangular part of the model rdm(s) and that of neural rdm are put into columns.
+      If any one of the columns contains a NaN , the corresponding row is omitted.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: visualize() -> matplotlib.figure.Figure
+
+      
+      show the model rdm(s) and neural rdm in heatmap.
+
+      Each subplot shows a model or neural rdm. The regression coefficient of model rdm is shown in subplot's title.
+
+      :returns: *matplotlib.figure.Figure* -- the handle of plotted figure
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: __str__() -> str
+
+      
+      Return the name of estimator class
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: get_details()
+
+      
+      Return the details of estimator class in a dictonary, data will be serialized so that it can be written into JSON
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: NeuralRDMStability(activitypattern: numpy.ndarray, groups: numpy.ndarray, rdm_metric: str = 'correlation', type: str = 'spearman', ztransform: bool = False)
+
+   Bases: :py:obj:`MetaEstimator`
+
+
+   
+   calculate the stability of neural RDM across different splits of data
+
+   :Parameters: * **activitypattern** (*numpy.ndarray*) -- a 2D numpy array. the neural activity pattern matrix used for computing representation dissimilarity matrix. size = (nsample,nfeatures)
+                * **groups** (*numpy.ndarray*) -- array specifying the which group each row of activitypattern belongs to. Must have at least two unique values.
+                * **rdm_metric** (*str, optional*) -- _dissimilarity/distance metric passed to `scipy.spatial.distance.pdist` to compute neural rdm from activity pattern matrix, by default `"correlation"`
+                * **type** (*str, optional*) -- type of correlation measure, by default `"spearman"`.
+                  must be one of: `"spearman", "pearson", "kendall", "linreg"`
+                * **ztransform** (*bool, optional*) -- whether or not to perform fisher Z transform to the correlation coefficients, by default `False`.
+
+   :raises ValueError: ``groups`` must have at least two unique values
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. py:attribute:: Xs
+
+
+   .. py:attribute:: RDMs
+
+
+   .. py:attribute:: groups
+
+
+   .. py:method:: fit()
+
+      
+      Run estimator.
+      After self.fit() is called, `result` attribute of the estimator will be set, it will be an 1D numpy array.
+
+      Neural RDM is calculated for each group. Correlation between every possible pair of groups are calculated. Then the average is taken over all the calculated correlation coefficients.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: __str__() -> str
+
+      
+      Return the name of estimator class
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: visualize() -> matplotlib.figure.Figure
+
+      
+      show the neural rdm of different groups using heatmap.
+
+      Each subplot shows the neural rdm of one group.
+
+      :returns: *matplotlib.figure.Figure* -- the handle of plotted figure
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: get_details()
+
+      
+      Return the details of estimator class in a dictonary, data will be serialized so that it can be written into JSON
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+.. py:class:: PatternDecoding(activitypattern: numpy.ndarray, targets: numpy.ndarray, groups: numpy.ndarray, decoder: str, decoder_kwarg: dict = {}, targetnames: list = None, regression=False, scoring_func: Union[str, callable] = None, scoring_funcname: str = None)
+
+   Bases: :py:obj:`MetaEstimator`
+
+
+   
+   decode from neural activity pattern with cross validation
+   Important note: this hasn't been tested in whole-brain searchlight yet
+
+   :Parameters: * **activitypattern** (*numpy.ndarray*) -- a 2D numpy array of size `(nsample,nfeature)`. the neural activity pattern matrix used for decoding.
+                * **targets** (*numpy.ndarray*) -- a 2D or 1D numpy array of size `(nsample,ntarget)` or `(nsample,)`.  Target values for prediction (class labels in classification, real numbers in regression).
+                * **groups** (*numpy.ndarray*) -- a 1D numpy array of size `(nsample,)`. Group values used for splitting data into decoder fitting and evaluation set. Must have at least two unique values
+                * **decoder** (str or an estimator object implementing decoding analysis with `fit` and `predict`) -- decoder used to perform the analysis
+                * **decoder_kwarg** (*dict*) -- arguments passed to decoder class to instantiate a decoder
+                * **regression** (*bool*) -- regression or classification decoder. If ``True``, will find in regression decoders, if ``False``, will find in classification decoders. by default ``False``.
+                * **targetnames** (*list, optional*) -- a list of model names. If `None` models will be named as m1,m2,..., by default `None`
+                * **scoring_func** (*str or callable, optional*) -- a scoring function that will be used to compute the quality of prediction after fitting the decoder. If None, will use accuracy score for classification and use r_square for regression.
+                * **scoring_funcname** (*str, optional*) -- name of the scoring function if an customised callable is passed in `scoring_funcname`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. py:attribute:: multioutput
+
+
+   .. py:attribute:: targetnames
+      :value: None
+
+
+
+   .. py:attribute:: basedecoder
+
+
+   .. py:attribute:: decoder_kwarg
+
+
+   .. py:attribute:: score
+      :value: None
+
+
+
+   .. py:attribute:: scorename
+      :value: None
+
+
+
+   .. py:attribute:: X
+
+
+   .. py:attribute:: Y
+
+
+   .. py:attribute:: groups
+
+
+   .. py:method:: fit()
+
+      
+      Run estimator.
+      After self.fit() is called, `result` attribute of the estimator will be set, it will be an 1D numpy array.
+
+      Run decoding in cross-validation. data is splitted according to `self.groups`. Leave-one-group-out cross-validation is used. The result saved is [average fit score, average cv evaluation score]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: visualize() -> matplotlib.figure.Figure
+
+      
+      show the score of the decoder in fit and evaliatopm set using scatter plots
+
+      :returns: *matplotlib.figure.Figure* -- the handle of plotted figure
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: __str__() -> str
+
+      
+      Return the name of estimator class
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: get_details()
+
+      
+      Return the details of estimator class in a dictonary, data will be serialized so that it can be written into JSON
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+

@@ -4,15 +4,6 @@
 .. automodule:: zpyhelper.MVPA.estimators
 
    
-   
-   
-
-   
-   
-   
-
-   
-   
    .. rubric:: Classes
 
    .. autosummary::
@@ -23,11 +14,3 @@
       PatternCorrelation
       PatternDecoding
    
-   
-
-   
-   
-   
-
-
-

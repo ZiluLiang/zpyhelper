@@ -63,3 +63,7 @@ apidoc_extra_args = ["-f","-F"]
 
 html_theme = 'alabaster'
 html_static_path = ['_static']
+
+# Sphinx AutoAPI
+extensions.append('autoapi.extension')
+autoapi_dirs = ['../zpyhelper']

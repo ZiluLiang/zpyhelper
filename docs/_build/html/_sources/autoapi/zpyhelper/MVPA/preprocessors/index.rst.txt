@@ -1,0 +1,418 @@
+zpyhelper.MVPA.preprocessors
+============================
+
+.. py:module:: zpyhelper.MVPA.preprocessors
+
+.. autoapi-nested-parse::
+
+   Methods for preprocessing activity pattern matrix
+
+   ..
+       !! processed by numpydoc !!
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   zpyhelper.MVPA.preprocessors.split_data
+   zpyhelper.MVPA.preprocessors.concat_data
+   zpyhelper.MVPA.preprocessors.scale_feature
+   zpyhelper.MVPA.preprocessors._rowwise_standardize
+   zpyhelper.MVPA.preprocessors.average_odd_even_session
+   zpyhelper.MVPA.preprocessors.average_flexi_session
+   zpyhelper.MVPA.preprocessors._estimate_whitening_from_resid
+   zpyhelper.MVPA.preprocessors.normalise_multivariate_noise
+   zpyhelper.MVPA.preprocessors.extract_pc
+   zpyhelper.MVPA.preprocessors.rmsd
+   zpyhelper.MVPA.preprocessors.kabsch_algorithm
+   zpyhelper.MVPA.preprocessors.chain_steps
+
+
+Module Contents
+---------------
+
+.. py:function:: split_data(X: numpy.ndarray, groups=None, return_groups=False, select_groups: list = None, **kwargs) -> Union[list, tuple]
+
+   
+   split data into groups
+
+   :Parameters: * **X** (*numpy.ndarray*) -- data to be split
+                * **groups** (*array, optional*) -- array specifying the which group each row of data belongs to, if `None`, all rows are assumed to be from the same group. by default None
+                * **return_groups** (*bool, optional*) -- whether or not to return the group corresponding to the split
+                * **select_groups** (*list, optional*) -- the (subset of) groups used to return. If `None`, will return the splits corresponding to all groups. If a list, will only return the splits corresponding to the specified groups
+
+   :returns: *list or tuple* -- data list or tuple of (data list, unique group) if `return_groups` is ``True``
+             Each element of data list is the data of one group.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: concat_data(Xlist: list) -> numpy.ndarray
+
+   
+   concatenate list of data array into one array
+
+   :Parameters: **Xlist** (*list*) -- list of data array, all of which must have same number of columns
+
+   :returns: *numpy.ndarray*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: scale_feature(X: numpy.ndarray, s_dir: int = 2, standardize: bool = True) -> numpy.ndarray
+
+   
+   standardize or center a 1D or 2D numpy array by using ZX = (X - mean)/std
+
+   :Parameters: * **X** (*numpy.ndarray*) -- the 1D or 2D numpy array that needs to be normalized
+                * **s_dir** (*int, optional*) -- the direction along which to perform standardization
+
+                  if 0, will perfrom standardization independently for each row
+
+                  if 1, will perform standardization independently for each column
+
+                  if 2, will perform standardization on the whole matrix
+
+                  by default 2
+                * **standardize** (*bool, optional*) -- whether or not to standardize, by default `True`
+
+   :returns: *numpy.ndarray* -- standardized 1D or 2D array ZX
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: _rowwise_standardize(X: numpy.ndarray, standardize: bool) -> numpy.ndarray
+
+   
+   standarderdize or center an array rowwise
+
+   :Parameters: * **X** (*numpy.ndarray*)
+                * **standardize** (*bool*) -- whether or not to standardize
+
+   :returns: *numpy.ndarray* -- _description_
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: average_odd_even_session(activitypatternmatrix: numpy.ndarray, session: numpy.ndarray, **kwargs) -> numpy.ndarray
+
+   
+   average data in odd and even session separately
+
+   :Parameters: * **activitypatternmatrix** (*numpy.ndarray*) -- data matrix of shape `(nsample,nvoxel)`
+                * **session** (*numpy.ndarray*) -- array specifying the which session each row of data belongs to.
+
+   :returns: *numpy.ndarray* -- transformed data matrix
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: average_flexi_session(activitypatternmatrix: numpy.ndarray, session: numpy.ndarray, average_by: list) -> numpy.ndarray
+
+   
+   average data in by flexible session separately
+
+   :Parameters: * **activitypatternmatrix** (*numpy.ndarray*) -- data matrix of shape `(nsample,nvoxel)`
+                * **session** (*numpy.ndarray*) -- array specifying the which session each row of data belongs to.
+                * **average_by** (*list*) -- list specifying groups of sessions that will be averaged across.
+
+                  For example, `average_by = [[0,1],[2,3]]` will return the average activity pattern of session 0 and 1, and the average activity pattern of session 2 and 3
+
+   :returns: *numpy.ndarray* -- transformed data matrix
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: _estimate_whitening_from_resid(res) -> numpy.ndarray
+
+   
+   estimate a whitening matrix from a residual matrix with Oracle Approximating Shrinkage method
+   similar to the implementation@https://osf.io/dzqs2
+
+   :Parameters: **res** (*numpy.ndarray*) -- residual matrix of size ``(nsample,nfeature)``
+
+   :returns: *numpy.ndarray* -- whitening matrix of size ``(nfeature,nfeature)``
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: normalise_multivariate_noise(activitypatternmatrix: numpy.ndarray, residualmatrix: numpy.ndarray, ap_groups: numpy.ndarray = None, resid_groups: numpy.ndarray = None, **kwargs) -> numpy.ndarray
+
+   
+   perform multivariate noise normalisation on the activity pattern matrix.
+   The activity pattern matrix and residual matrix is first split into groups.
+
+   For each group of data, a whitening matrix is estimated from the residual matrix and then applied to the acitvity pattern matrix.
+
+   Splits are then concatenated back to the original shape.
+   similar to the implementation@https://osf.io/3k759
+
+   :Parameters: * **activitypatternmatrix** (*numpy.ndarray*) -- data matrix of shape `(n_data_sample,nvoxel)`
+                * **residualmatrix** (*numpy.ndarray*) -- residual matrix of shape `(n_residual_sample,nvoxel)`
+                * **ap_groups** (*numpy.ndarray*) -- array specifying the which group each row of data belongs to, if `None`, all rows are assumed to be from the same group. by default None
+                * **resid_groups** (*numpy.ndarray*) -- array specifying the which group each row of residual matrix belongs to, if `None`, all rows are assumed to be from the same group. by default None
+
+   :returns: *numpy.ndarray* -- whitened data matrix
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: extract_pc(activitypatternmatrix: numpy.ndarray, n_components=None, **kwargs) -> numpy.ndarray
+
+   
+   Perform PCA and transform the data accordingly
+
+   :Parameters: * **activitypatternmatrix** (*numpy.ndarray*) -- data matrix of shape `(n_data_sample,nvoxel)`
+                * **n_components** (*_type_, optional*) -- if `n_components>1`, it specifies the number of components.
+
+                  if `n_components<1`, it specifies the percentage of variance explained.
+                  if `None`, all pcs will be kept.
+                  by default None
+
+   :returns: *numpy.ndarray* -- transformed data matrix
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: rmsd(X: numpy.ndarray, Y: numpy.ndarray) -> float
+
+   
+   Calculate the root mean square deviation between two matrices
+
+   :Parameters: * **X** (*numpy.ndarray*) -- Matrix 1
+                * **Y** (*numpy.ndarray*) -- Matrix 2
+
+   :returns: *float* -- Root mean square deviation between X and Y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: kabsch_algorithm(P: numpy.ndarray, Q: numpy.ndarray, translation: bool = False) -> tuple
+
+   
+   use Kabsch algorithm to compute the optimal rotation matrix that aligns P to Q.
+
+   P and Q are NxK matrices where K is the dimensionality and N is the number of points.
+   Reference: https://github.com/charnley/rmsd/blob/master/rmsd/calculate_rmsd.py
+
+   The algorithm is based on the following steps:
+
+   :Parameters: * **P** (*numpy.ndarray*) -- source matrix that needed to be aligned to Q
+                * **Q** (*numpy.ndarray*) -- reference matrix that P will be aligned to
+                * **translation** (*bool, optional*) -- if True, will use centroids to translate P and Q onto each other, by default False
+
+   :returns: *a tuple of (Phat, R, rmsd)* -- Phat is the rotated P.
+
+             R is the estimated rotation matrix
+
+             The rmsd between the rotated P and Q
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: chain_steps(*varargin)
+
+   
+   Chaining different preprocessing functions together and compose it into one preprocessing function.
+
+   parameters for different preprocessing steps will also be set.
+
+   The composed function will only take the activity pattern matrix as input.
+
+   The composed function will apply the steps sequentially
+   Each argument must be a tuple of length `2` and specify `(function, function_fixed_argument)`:
+
+       - `function`: a callable that takes the activity pattern as input and return preprocessed activity pattern
+       - `function_fixed_argument`: a dictionary the contains arguments apart from the activity pattern matrix that will be passed to the callable
+
+   For example:
+
+   The following code
+
+   ```
+   step1 = (func1,param1)
+   step2 = (func2,param2)
+   preproc_func = chain_steps(step1,step2)`
+   X_preproc = preproc_func(X)
+   ```
+   is equivalent to:
+
+   ```
+   X_preproc = func2(func1(X,**param1),**param2)
+   ```
+
+   :returns: *callable* -- composed preprocessing function
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

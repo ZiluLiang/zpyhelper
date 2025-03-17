@@ -1,0 +1,41 @@
+zpyhelper.MVPA
+==============
+
+.. py:module:: zpyhelper.MVPA
+
+.. autoapi-nested-parse::
+
+   
+   MVPA.
+
+   helper functions for performing MVPA.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/zpyhelper/MVPA/estimators/index
+   /autoapi/zpyhelper/MVPA/preprocessors/index
+   /autoapi/zpyhelper/MVPA/rdm/index
+
+

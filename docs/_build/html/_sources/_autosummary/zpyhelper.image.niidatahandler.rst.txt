@@ -1,13 +1,8 @@
-zpyhelper.image.niidatahandler
+﻿zpyhelper.image.niidatahandler
 ==============================
 
 .. automodule:: zpyhelper.image.niidatahandler
 
-   
-   
-   
-
-   
    
    .. rubric:: Functions
 
@@ -16,15 +11,3 @@ zpyhelper.image.niidatahandler
       retrieve_data_from_image
       write_data_to_image
    
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-

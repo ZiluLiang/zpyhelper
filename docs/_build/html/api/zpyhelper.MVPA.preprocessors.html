@@ -6,10 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <title>zpyhelper.MVPA.preprocessors module &#8212; zpyhelper  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d1102ebc" />
-    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -36,7 +38,8 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="zpyhelper.MVPA.preprocessors._estimate_whitening_from_resid">
 <span class="sig-prename descclassname"><span class="pre">zpyhelper.MVPA.preprocessors.</span></span><span class="sig-name descname"><span class="pre">_estimate_whitening_from_resid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">res</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/zpyhelper/MVPA/preprocessors.html#_estimate_whitening_from_resid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.preprocessors._estimate_whitening_from_resid" title="Link to this definition">¶</a></dt>
-<dd><p>estimate a whitening matrix from a residual matrix with Oracle Approximating Shrinkage method</p>
+<dd><p>estimate a whitening matrix from a residual matrix with Oracle Approximating Shrinkage method
+similar to the <a class="reference external" href="mailto:implementation&#37;&#52;&#48;https">implementation<span>&#64;</span>https</a>://osf.io/dzqs2</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>res</strong> (<em>numpy.ndarray</em>) – residual matrix of size <code class="docutils literal notranslate"><span class="pre">(nsample,nfeature)</span></code></p>
@@ -170,12 +173,37 @@ by default None</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.preprocessors.kabsch_algorithm">
+<span class="sig-prename descclassname"><span class="pre">zpyhelper.MVPA.preprocessors.</span></span><span class="sig-name descname"><span class="pre">kabsch_algorithm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">translation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="reference internal" href="../_modules/zpyhelper/MVPA/preprocessors.html#kabsch_algorithm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.preprocessors.kabsch_algorithm" title="Link to this definition">¶</a></dt>
+<dd><p>use Kabsch algorithm to compute the optimal rotation matrix that aligns P to Q.</p>
+<p>P and Q are NxK matrices where K is the dimensionality and N is the number of points.
+Reference: <a class="reference external" href="https://github.com/charnley/rmsd/blob/master/rmsd/calculate_rmsd.py">https://github.com/charnley/rmsd/blob/master/rmsd/calculate_rmsd.py</a></p>
+<p>The algorithm is based on the following steps:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>P</strong> (<em>numpy.ndarray</em>) – source matrix that needed to be aligned to Q</p></li>
+<li><p><strong>Q</strong> (<em>numpy.ndarray</em>) – reference matrix that P will be aligned to</p></li>
+<li><p><strong>translation</strong> (<em>bool, optional</em>) – if True, will use centroids to translate P and Q onto each other, by default False</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p><em>a tuple of (Phat, R, rmsd)</em> – Phat is the rotated P.</p>
+<p>R is the estimated rotation matrix</p>
+<p>The rmsd between the rotated P and Q</p>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="zpyhelper.MVPA.preprocessors.normalise_multivariate_noise">
-<span class="sig-prename descclassname"><span class="pre">zpyhelper.MVPA.preprocessors.</span></span><span class="sig-name descname"><span class="pre">normalise_multivariate_noise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">activitypatternmatrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residualmatrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ap_groups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resid_groups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/zpyhelper/MVPA/preprocessors.html#normalise_multivariate_noise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.preprocessors.normalise_multivariate_noise" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">zpyhelper.MVPA.preprocessors.</span></span><span class="sig-name descname"><span class="pre">normalise_multivariate_noise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">activitypatternmatrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residualmatrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ap_groups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resid_groups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/zpyhelper/MVPA/preprocessors.html#normalise_multivariate_noise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.preprocessors.normalise_multivariate_noise" title="Link to this definition">¶</a></dt>
 <dd><p>perform multivariate noise normalisation on the activity pattern matrix.
 The activity pattern matrix and residual matrix is first split into groups.</p>
 <p>For each group of data, a whitening matrix is estimated from the residual matrix and then applied to the acitvity pattern matrix.</p>
-<p>Splits are then concatenated back to the original shape.</p>
+<p>Splits are then concatenated back to the original shape.
+similar to the <a class="reference external" href="mailto:implementation&#37;&#52;&#48;https">implementation<span>&#64;</span>https</a>://osf.io/3k759</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -187,6 +215,23 @@ The activity pattern matrix and residual matrix is first split into groups.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>numpy.ndarray</em> – whitened data matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.preprocessors.rmsd">
+<span class="sig-prename descclassname"><span class="pre">zpyhelper.MVPA.preprocessors.</span></span><span class="sig-name descname"><span class="pre">rmsd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="../_modules/zpyhelper/MVPA/preprocessors.html#rmsd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.preprocessors.rmsd" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate the root mean square deviation between two matrices</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>numpy.ndarray</em>) – Matrix 1</p></li>
+<li><p><strong>Y</strong> (<em>numpy.ndarray</em>) – Matrix 2</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>float</em> – Root mean square deviation between X and Y</p>
 </dd>
 </dl>
 </dd></dl>
@@ -216,7 +261,7 @@ The activity pattern matrix and residual matrix is first split into groups.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="zpyhelper.MVPA.preprocessors.split_data">
-<span class="sig-prename descclassname"><span class="pre">zpyhelper.MVPA.preprocessors.</span></span><span class="sig-name descname"><span class="pre">split_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">select_groups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span></span></span><a class="reference internal" href="../_modules/zpyhelper/MVPA/preprocessors.html#split_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.preprocessors.split_data" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">zpyhelper.MVPA.preprocessors.</span></span><span class="sig-name descname"><span class="pre">split_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_groups</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">select_groups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span></span></span><a class="reference internal" href="../_modules/zpyhelper/MVPA/preprocessors.html#split_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.preprocessors.split_data" title="Link to this definition">¶</a></dt>
 <dd><p>split data into groups</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -241,7 +286,7 @@ Each element of data list is the data of one group.</p>
           
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <h1 class="logo"><a href="../index.html">zpyhelper</a></h1>
 
@@ -252,9 +297,19 @@ Each element of data list is the data of one group.</p>
 
 
 
-<h3>Navigation</h3>
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_autosummary/zpyhelper.html">zpyhelper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../autoapi/index.html">API Reference</a></li>
 </ul>
 
 <div class="relations">
@@ -264,16 +319,6 @@ Each element of data list is the data of one group.</p>
   </ul></li>
 </ul>
 </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -290,8 +335,8 @@ Each element of data list is the data of one group.</p>
       &#169;2024, Zilu Liang.
       
       |
-      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
-      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
       
       |
       <a href="../_sources/api/zpyhelper.MVPA.preprocessors.rst.txt"

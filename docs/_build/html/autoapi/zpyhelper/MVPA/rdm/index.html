@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>zpyhelper.MVPA.rdm &#8212; zpyhelper  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+    <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="zpyhelper.filesys" href="../../filesys/index.html" />
+    <link rel="prev" title="zpyhelper.MVPA.preprocessors" href="../preprocessors/index.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-zpyhelper.MVPA.rdm">
+<span id="zpyhelper-mvpa-rdm"></span><h1>zpyhelper.MVPA.rdm<a class="headerlink" href="#module-zpyhelper.MVPA.rdm" title="Link to this heading">¶</a></h1>
+<p>This module contains helper function for computing representation (dis)similarity matrix</p>
+<p>Zilu Liang &#64;HIPlab Oxford
+2024</p>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#zpyhelper.MVPA.rdm.check_array" title="zpyhelper.MVPA.rdm.check_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_array</span></code></a>(→ numpy.ndarray)</p></td>
+<td><p>check if the dimensionality of array satisfies criteria</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#zpyhelper.MVPA.rdm.lower_tri" title="zpyhelper.MVPA.rdm.lower_tri"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lower_tri</span></code></a>(→ tuple)</p></td>
+<td><p>return the lower triangular part of the RDM, excluding the diagonal elements</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#zpyhelper.MVPA.rdm.upper_tri" title="zpyhelper.MVPA.rdm.upper_tri"><code class="xref py py-obj docutils literal notranslate"><span class="pre">upper_tri</span></code></a>(→ tuple)</p></td>
+<td><p>return the upper triangular part of the RDM, excluding the diagonal elements</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#zpyhelper.MVPA.rdm.compute_R2" title="zpyhelper.MVPA.rdm.compute_R2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_R2</span></code></a>(→ tuple)</p></td>
+<td><p>compute the coefficient of determination (R-square or adjusted R-square) of a model based on prediction and true value</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#zpyhelper.MVPA.rdm.compute_rdm" title="zpyhelper.MVPA.rdm.compute_rdm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_rdm</span></code></a>(→ numpy.ndarray)</p></td>
+<td><p>compute the dissimilarity matrix of a nsample x nfeature matrix.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#zpyhelper.MVPA.rdm.nan_equal" title="zpyhelper.MVPA.rdm.nan_equal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nan_equal</span></code></a>(→ numpy.ndarray)</p></td>
+<td><p>check element-wise if two numpy array are equal. nan value comparisons will result in nan. In the result array, boolean values are converted in to 1 and 0.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#zpyhelper.MVPA.rdm.compute_rdm_identity" title="zpyhelper.MVPA.rdm.compute_rdm_identity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_rdm_identity</span></code></a>(→ numpy.ndarray)</p></td>
+<td><p>comput the dissimilarity matrix based on sample identity, if the pair have the same value, distance will be zero, otherwise will be one.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#zpyhelper.MVPA.rdm.compute_rdm_nomial" title="zpyhelper.MVPA.rdm.compute_rdm_nomial"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_rdm_nomial</span></code></a>(→ numpy.ndarray)</p></td>
+<td><p>compute the dissimilarity matrix based on samples' nomial features. Must have at least 2 features, otherwise should use <code class="docutils literal notranslate"><span class="pre">compute_rdm_identity</span></code> instead.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#zpyhelper.MVPA.rdm.compute_rdm_residual" title="zpyhelper.MVPA.rdm.compute_rdm_residual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_rdm_residual</span></code></a>(rdm, control_rdms[, squareform])</p></td>
+<td><p>compute the residual of rdm after explaining for control rdms</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.rdm.check_array">
+<span class="sig-prename descclassname"><span class="pre">zpyhelper.MVPA.rdm.</span></span><span class="sig-name descname"><span class="pre">check_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ensure_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_feature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/rdm.html#check_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.rdm.check_array" title="Link to this definition">¶</a></dt>
+<dd><p>check if the dimensionality of array satisfies criteria</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>object</em>) – the object to be transformed in to numpy.ndarray</p></li>
+<li><p><strong>ensure_dim</strong> (<em>int</em>) – ensure dimensionality of the transformed array, by default <code class="docutils literal notranslate"><span class="pre">1</span></code></p></li>
+<li><p><strong>min_sample</strong> (<em>int, optional</em>) – minimum number of samples (length of the first axis), by default <code class="docutils literal notranslate"><span class="pre">1</span></code></p></li>
+<li><p><strong>min_feature</strong> (<em>int, optional</em>) – minimum number of features (length of the second axis), only matters if <code class="docutils literal notranslate"><span class="pre">ensure_dim==2</span></code>, by default <code class="docutils literal notranslate"><span class="pre">1</span></code></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>numpy.ndarray</em></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.rdm.lower_tri">
+<span class="sig-prename descclassname"><span class="pre">zpyhelper.MVPA.rdm.</span></span><span class="sig-name descname"><span class="pre">lower_tri</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rdm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/rdm.html#lower_tri"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.rdm.lower_tri" title="Link to this definition">¶</a></dt>
+<dd><p>return the lower triangular part of the RDM, excluding the diagonal elements</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rdm</strong> (<em>numpy.ndarray</em>) – the representation dissimilarity matrix of size <code class="docutils literal notranslate"><span class="pre">(nsample,nsample)</span></code></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple</strong> (<em>(rdm_tril,lower_tril_idx)</em>) – rdm_tril: the lower triangular part of the RDM, excluding the diagonal elements
+lower_tril_idx: the index of the lower triangular part of the RDM, excluding the diagonal elements</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.rdm.upper_tri">
+<span class="sig-prename descclassname"><span class="pre">zpyhelper.MVPA.rdm.</span></span><span class="sig-name descname"><span class="pre">upper_tri</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rdm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/rdm.html#upper_tri"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.rdm.upper_tri" title="Link to this definition">¶</a></dt>
+<dd><p>return the upper triangular part of the RDM, excluding the diagonal elements</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rdm</strong> (<em>numpy.ndarray</em>) – the representation dissimilarity matrix. of size <code class="docutils literal notranslate"><span class="pre">(nsample,nsample)</span></code></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>tuple</strong> (<em>(rdm_tril,upper_tril_idx)</em>) – rdm_tril: a 1D numpy array. the upper triangular part of the RDM, excluding the diagonal elements
+upper_tril_idx: a 1D numpy array. the index of the upper triangular part of the RDM, excluding the diagonal elements</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.rdm.compute_R2">
+<span class="sig-prename descclassname"><span class="pre">zpyhelper.MVPA.rdm.</span></span><span class="sig-name descname"><span class="pre">compute_R2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_pred</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_true</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nparam</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span></span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/rdm.html#compute_R2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.rdm.compute_R2" title="Link to this definition">¶</a></dt>
+<dd><p>compute the coefficient of determination (R-square or adjusted R-square) of a model based on prediction and true value
+based on formula in <a class="reference external" href="https://en.wikipedia.org/wiki/Coefficient_of_determination">https://en.wikipedia.org/wiki/Coefficient_of_determination</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y_pred</strong> (<em>numpy.ndarray</em>) – 1D numpy array of predicted y values</p></li>
+<li><p><strong>y_true</strong> (<em>numpy.ndarray</em>) – 1D numpy array of true (observed) y values</p></li>
+<li><p><strong>nparam</strong> (<em>int</em>) – number of parameters in the model</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>tuple</em> – a tuple of (r-squared, adjusted r-squared)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.rdm.compute_rdm">
+<span class="sig-prename descclassname"><span class="pre">zpyhelper.MVPA.rdm.</span></span><span class="sig-name descname"><span class="pre">compute_rdm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/rdm.html#compute_rdm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.rdm.compute_rdm" title="Link to this definition">¶</a></dt>
+<dd><p>compute the dissimilarity matrix of a nsample x nfeature matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pattern_matrix</strong> (<em>numpy.ndarray</em>) – pattern_matrix containing samples’ features, of size <code class="docutils literal notranslate"><span class="pre">(nsample,nfeature)</span></code></p></li>
+<li><p><strong>metric</strong> (<em>str</em>) – dissimilarity/distance metric passed to <cite>scipy.spatial.distance.pdist</cite></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>numpy.ndarray</em> – dissimliarity matrix of size <code class="docutils literal notranslate"><span class="pre">(nsample,nsample)</span></code></p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Exception</strong> – pattern matrix must be 2D with minimum of 2 samples and 1 feature</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.rdm.nan_equal">
+<span class="sig-prename descclassname"><span class="pre">zpyhelper.MVPA.rdm.</span></span><span class="sig-name descname"><span class="pre">nan_equal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/rdm.html#nan_equal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.rdm.nan_equal" title="Link to this definition">¶</a></dt>
+<dd><p>check element-wise if two numpy array are equal. nan value comparisons will result in nan. In the result array, boolean values are converted in to 1 and 0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<em>numpy.ndarray</em>) – Input array</p></li>
+<li><p><strong>b</strong> (<em>numpy.ndarray</em>) – Input array</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>numpy.ndarray</em> – The result array from comparison, has the same shape as input arrays.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.rdm.compute_rdm_identity">
+<span class="sig-prename descclassname"><span class="pre">zpyhelper.MVPA.rdm.</span></span><span class="sig-name descname"><span class="pre">compute_rdm_identity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/rdm.html#compute_rdm_identity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.rdm.compute_rdm_identity" title="Link to this definition">¶</a></dt>
+<dd><p>comput the dissimilarity matrix based on sample identity, if the pair have the same value, distance will be zero, otherwise will be one.
+This is similar to the ‘scipy.spatial.distance.hamming’ except that nan values will return nan instead of included in distance computation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pattern_matrix</strong> (<em>numpy.ndarray</em>) – pattern_matrix containing samples’ identity, of size <code class="docutils literal notranslate"><span class="pre">(nsample,)</span></code></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>numpy.ndarray</em> – dissimliarity matrix of size <code class="docutils literal notranslate"><span class="pre">(nsample,nsample)</span></code></p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Exception</strong> – pattern matrix must be 1D with minimum of 2 samples</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.rdm.compute_rdm_nomial">
+<span class="sig-prename descclassname"><span class="pre">zpyhelper.MVPA.rdm.</span></span><span class="sig-name descname"><span class="pre">compute_rdm_nomial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern_matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span></span></span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/rdm.html#compute_rdm_nomial"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.rdm.compute_rdm_nomial" title="Link to this definition">¶</a></dt>
+<dd><p>compute the dissimilarity matrix based on samples’ nomial features. Must have at least 2 features, otherwise should use <code class="docutils literal notranslate"><span class="pre">compute_rdm_identity</span></code> instead.
+This is similar to the ‘scipy.spatial.distance.hamming’ except that nan values will return nan instead of included in distance computation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pattern_matrix</strong> (<em>numpy.ndarray</em>) – pattern_matrix containing samples’ features, of size <code class="docutils literal notranslate"><span class="pre">(nsample,nfeature)</span></code></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>numpy.ndarray</em> – dissimliarity matrix of size <code class="docutils literal notranslate"><span class="pre">(nsample,nsample)</span></code></p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Exception</strong> – pattern matrix must be 2D with minimum of 2 samples and 2 features</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="zpyhelper.MVPA.rdm.compute_rdm_residual">
+<span class="sig-prename descclassname"><span class="pre">zpyhelper.MVPA.rdm.</span></span><span class="sig-name descname"><span class="pre">compute_rdm_residual</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rdm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">control_rdms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">squareform</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zpyhelper/MVPA/rdm.html#compute_rdm_residual"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.MVPA.rdm.compute_rdm_residual" title="Link to this definition">¶</a></dt>
+<dd><p>compute the residual of rdm after explaining for control rdms</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rdm</strong> (<em>numpy.ndarray</em>) – the target rdm</p></li>
+<li><p><strong>control_rdms</strong> (<em>list or numpy.ndarray</em>) – a control rdm or a list of control rdms</p></li>
+<li><p><strong>squareform</strong> (<em>bool, optional</em>) – to put residual back to square form or not, by default True</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>numpy.ndarray</em> – the residual rdm, if <code class="docutils literal notranslate"><span class="pre">squareform==True</span></code>, the shape will be the same as the original rdm, otherwise, the lower triangular part will be returned</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../index.html">zpyhelper</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../_autosummary/zpyhelper.html">zpyhelper</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html">zpyhelper</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="../index.html">zpyhelper.MVPA</a><ul class="current">
+<li class="toctree-l5 current"><a class="reference internal" href="../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l6"><a class="reference internal" href="../estimators/index.html">zpyhelper.MVPA.estimators</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../preprocessors/index.html">zpyhelper.MVPA.preprocessors</a></li>
+<li class="toctree-l6 current"><a class="current reference internal" href="#">zpyhelper.MVPA.rdm</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#functions">Functions</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li class="toctree-l8"><a class="reference internal" href="#zpyhelper.MVPA.rdm.check_array"><code class="docutils literal notranslate"><span class="pre">check_array()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#zpyhelper.MVPA.rdm.lower_tri"><code class="docutils literal notranslate"><span class="pre">lower_tri()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#zpyhelper.MVPA.rdm.upper_tri"><code class="docutils literal notranslate"><span class="pre">upper_tri()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#zpyhelper.MVPA.rdm.compute_R2"><code class="docutils literal notranslate"><span class="pre">compute_R2()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#zpyhelper.MVPA.rdm.compute_rdm"><code class="docutils literal notranslate"><span class="pre">compute_rdm()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#zpyhelper.MVPA.rdm.nan_equal"><code class="docutils literal notranslate"><span class="pre">nan_equal()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#zpyhelper.MVPA.rdm.compute_rdm_identity"><code class="docutils literal notranslate"><span class="pre">compute_rdm_identity()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#zpyhelper.MVPA.rdm.compute_rdm_nomial"><code class="docutils literal notranslate"><span class="pre">compute_rdm_nomial()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#zpyhelper.MVPA.rdm.compute_rdm_residual"><code class="docutils literal notranslate"><span class="pre">compute_rdm_residual()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../filesys/index.html">zpyhelper.filesys</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../image/index.html">zpyhelper.image</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">API Reference</a><ul>
+  <li><a href="../../index.html">zpyhelper</a><ul>
+  <li><a href="../index.html">zpyhelper.MVPA</a><ul>
+      <li>Previous: <a href="../preprocessors/index.html" title="previous chapter">zpyhelper.MVPA.preprocessors</a></li>
+      <li>Next: <a href="../../filesys/index.html" title="next chapter">zpyhelper.filesys</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Zilu Liang.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../../../_sources/autoapi/zpyhelper/MVPA/rdm/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

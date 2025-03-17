@@ -1,0 +1,70 @@
+zpyhelper.filesys
+=================
+
+.. py:module:: zpyhelper.filesys
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   zpyhelper.filesys.checkdir
+   zpyhelper.filesys.is_jsonable
+
+
+Module Contents
+---------------
+
+.. py:function:: checkdir(dirs: Union[list, str])
+
+   
+   check if directories exist, if not, generate directories
+
+   :Parameters: **dirs** (*list or str*) -- a list of directory strings or a directory string
+
+   :raises Exception: input must be list or string
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: is_jsonable(x) -> bool
+
+   
+   check if an object is JSON serializable
+
+   :Parameters: **x** (*any*) -- the object to check
+
+   :returns: *bool* -- `True`: serializable
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

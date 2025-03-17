@@ -3,8 +3,8 @@ zpyhelper.image package
 
 .. automodule:: zpyhelper.image
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 Submodules
 ----------

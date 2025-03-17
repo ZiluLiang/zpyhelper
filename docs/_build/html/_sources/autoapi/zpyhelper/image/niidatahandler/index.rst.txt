@@ -1,0 +1,100 @@
+zpyhelper.image.niidatahandler
+==============================
+
+.. py:module:: zpyhelper.image.niidatahandler
+
+.. autoapi-nested-parse::
+
+   Methods for loading data from nii image and writing data to image
+
+   Zilu Liang @HIPlab Oxford
+   2023
+
+   ..
+       !! processed by numpydoc !!
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   zpyhelper.image.niidatahandler._check_single_image
+   zpyhelper.image.niidatahandler._check_and_load_images
+   zpyhelper.image.niidatahandler.write_data_to_image
+   zpyhelper.image.niidatahandler.retrieve_data_from_image
+
+
+Module Contents
+---------------
+
+.. py:function:: _check_single_image(image)
+
+.. py:function:: _check_and_load_images(imgs, mode: str = 'pass', intersect_threshold=1)
+
+.. py:function:: write_data_to_image(data: numpy.ndarray, mask_imgs: Union[str, list], ref_img: Union[str] = None, ensure_finite: bool = False, outputpath: str = None)
+
+   
+   create a nibabel image object to store data
+
+   :Parameters: * **data** (*numpy.ndarray*) -- a 1d or 2d data array to be saved in nii image.
+                  If data only has one dimension, a 3D image will be created. data array must contain same number of data points as the number of masked voxels.
+                  If data has two dimensions, a 4D image will be created. The columns of data will be mapped onto masked voxels, and each row specifies one volume of the 4D image.
+                * **mask_imgs** (*str or list, optional*) -- path or a list of (paths to) mask image(s). Data will be written to the voxels in the masks.
+                  If ``None``, data from all voxels in the 4D nii image will be loaded, by default ``None``
+                  If a single mask is provided,  only voxels in mask will be included
+                  If a list of masks is provided,  only voxels lying at the intersection of the masks will be included
+                * **ref_img** (*Niimg-like object*) -- Reference image. The new image will be of the same type. If `None`, will use the mask image as reference image.
+                * **ensure_finite** (*bool, optional*) -- whether or not to replace nans. If ``True``, nans will be saved as zero. If ``False``, will keep as nan. by default ``False``
+                * **outputpath** (*bool, optional*) -- the path to save image, if ``None``, image will not be saved. by default ``None``
+
+   :returns: * *data_3D_list* -- list containing data reshaped into same dimension as the mask
+             * *img* -- 4D or 3D nibabel image
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: retrieve_data_from_image(data_nii_paths: Union[str, list], mask_imgs: Union[str, list] = None, returnmask=False)
+
+   
+   retrieve data from nii images
+
+   :Parameters: * **data_nii_paths** (*str or list*) -- path or a list of paths to nii file containing the data to be loaded. If a list of paths is provided, nii files will be concatenated along the 3rd dimension (as 4D nii files)
+                * **mask_imgs** (*str or list, optional*) -- path or a list of paths to mask image(s).
+                  If ``None``, data from all voxels in the 4D nii image will be loaded, by default ``None``
+                  If a single mask is provided,  only voxels in mask will be included
+                  If a list of masks is provided,  only voxels lying at the intersection of the masks will be included
+
+   :raises LookupError: if any of the nii image files are not found, will throw error
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

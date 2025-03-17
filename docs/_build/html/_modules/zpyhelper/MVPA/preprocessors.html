@@ -5,10 +5,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>zpyhelper.MVPA.preprocessors &#8212; zpyhelper  documentation</title>
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=d1102ebc" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
     <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
@@ -34,15 +36,73 @@
 <span class="sd">&quot;&quot;&quot;Methods for preprocessing activity pattern matrix</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">from</span> <span class="nn">sklearn.covariance._shrunk_covariance</span> <span class="kn">import</span> <span class="n">_oas</span>
-<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span><span class="p">,</span> <span class="n">reduce</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.covariance._shrunk_covariance</span><span class="w"> </span><span class="kn">import</span> <span class="n">_oas</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.decomposition</span><span class="w"> </span><span class="kn">import</span> <span class="n">PCA</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span><span class="p">,</span> <span class="n">reduce</span>
 
+<span class="c1">####################### Data Splitting and Concatenation Methods #######################</span>
+<div class="viewcode-block" id="split_data">
+<a class="viewcode-back" href="../../../autoapi/zpyhelper/MVPA/preprocessors/index.html#zpyhelper.MVPA.preprocessors.split_data">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">split_data</span><span class="p">(</span><span class="n">X</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">groups</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">return_groups</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">select_groups</span><span class="p">:</span><span class="nb">list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span><span class="nb">tuple</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;split data into groups</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : numpy.ndarray</span>
+<span class="sd">        data to be split</span>
+<span class="sd">    groups : array, optional</span>
+<span class="sd">        array specifying the which group each row of data belongs to, if `None`, all rows are assumed to be from the same group. by default None</span>
+<span class="sd">    return_groups: bool, optional</span>
+<span class="sd">        whether or not to return the group corresponding to the split</span>
+<span class="sd">    select_groups:list, optional</span>
+<span class="sd">        the (subset of) groups used to return. If `None`, will return the splits corresponding to all groups. If a list, will only return the splits corresponding to the specified groups</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    list or tuple</span>
+<span class="sd">        data list or tuple of (data list, unique group) if `return_groups` is ``True``</span>
+<span class="sd">        Each element of data list is the data of one group.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">X</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">X</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Expected X to be 2D, but got </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2"> instead&quot;</span>
+    <span class="n">groups</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],))</span> <span class="k">if</span> <span class="n">groups</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">numpy</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">groups</span><span class="o">.</span><span class="n">size</span><span class="o">==</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;number of samples in X and groups does not match&quot;</span>
+    <span class="n">unique_groups</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span>
+    
+    <span class="n">select_groups</span> <span class="o">=</span> <span class="n">unique_groups</span> <span class="k">if</span> <span class="n">select_groups</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">select_groups</span>
+    <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="n">g</span> <span class="ow">in</span> <span class="n">unique_groups</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">select_groups</span><span class="p">]),</span> <span class="s2">&quot;some of the specified groups do not exist!&quot;</span>
+
+    <span class="k">if</span> <span class="n">return_groups</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">X</span><span class="p">[</span><span class="n">groups</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">==</span><span class="n">j</span><span class="p">,:]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">select_groups</span><span class="p">],</span> <span class="n">select_groups</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">X</span><span class="p">[</span><span class="n">groups</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">==</span><span class="n">j</span><span class="p">,:]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">select_groups</span><span class="p">]</span>   </div>
+
+
+<div class="viewcode-block" id="concat_data">
+<a class="viewcode-back" href="../../../autoapi/zpyhelper/MVPA/preprocessors/index.html#zpyhelper.MVPA.preprocessors.concat_data">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">concat_data</span><span class="p">(</span><span class="n">Xlist</span><span class="p">:</span><span class="nb">list</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;concatenate list of data array into one array</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Xlist : list</span>
+<span class="sd">        list of data array, all of which must have same number of columns</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    numpy.ndarray</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Xlist</span> <span class="o">=</span> <span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="k">for</span> <span class="n">X</span> <span class="ow">in</span> <span class="n">Xlist</span> <span class="k">if</span> <span class="nb">all</span><span class="p">([</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">ndim</span><span class="o">==</span><span class="mi">2</span><span class="p">,</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">])]</span>
+    <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">Xlist</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+
+
+
+<span class="c1">####################### Standardization and Centering Methods #######################</span>
 <div class="viewcode-block" id="scale_feature">
-<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.preprocessors.html#zpyhelper.MVPA.preprocessors.scale_feature">[docs]</a>
-<span class="k">def</span> <span class="nf">scale_feature</span><span class="p">(</span><span class="n">X</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">s_dir</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">standardize</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../autoapi/zpyhelper/MVPA/preprocessors/index.html#zpyhelper.MVPA.preprocessors.scale_feature">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">scale_feature</span><span class="p">(</span><span class="n">X</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">s_dir</span><span class="p">:</span><span class="nb">int</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">standardize</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; standardize or center a 1D or 2D numpy array by using ZX = (X - mean)/std</span>
 
 <span class="sd">    Parameters</span>
@@ -82,8 +142,8 @@
 
 
 <div class="viewcode-block" id="_rowwise_standardize">
-<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.preprocessors.html#zpyhelper.MVPA.preprocessors._rowwise_standardize">[docs]</a>
-<span class="k">def</span> <span class="nf">_rowwise_standardize</span><span class="p">(</span><span class="n">X</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">standardize</span><span class="p">:</span><span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../autoapi/zpyhelper/MVPA/preprocessors/index.html#zpyhelper.MVPA.preprocessors._rowwise_standardize">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_rowwise_standardize</span><span class="p">(</span><span class="n">X</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">standardize</span><span class="p">:</span><span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;standarderdize or center an array rowwise</span>
 
 <span class="sd">    Parameters</span>
@@ -103,10 +163,64 @@
     <span class="k">return</span> <span class="p">(</span><span class="n">X</span> <span class="o">-</span> <span class="n">row_means</span><span class="p">[:,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">newaxis</span><span class="p">])</span> <span class="o">/</span> <span class="n">denom</span></div>
 
 
+<div class="viewcode-block" id="average_odd_even_session">
+<a class="viewcode-back" href="../../../autoapi/zpyhelper/MVPA/preprocessors/index.html#zpyhelper.MVPA.preprocessors.average_odd_even_session">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">average_odd_even_session</span><span class="p">(</span><span class="n">activitypatternmatrix</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">session</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;average data in odd and even session separately</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    activitypatternmatrix : numpy.ndarray</span>
+<span class="sd">        data matrix of shape `(nsample,nvoxel)`</span>
+<span class="sd">    session : numpy.ndarray</span>
+<span class="sd">        array specifying the which session each row of data belongs to.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    numpy.ndarray</span>
+<span class="sd">        transformed data matrix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">activitypatternmatrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">session</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">X_list</span>  <span class="o">=</span> <span class="n">split_data</span><span class="p">(</span><span class="n">activitypatternmatrix</span><span class="p">,</span><span class="n">session</span><span class="p">)</span>
+    <span class="n">X_odd</span>   <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">X_list</span><span class="p">[</span><span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">],</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">X_even</span>  <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">X_list</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">],</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_list</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span> <span class="k">else</span> <span class="p">[]</span>
+    <span class="k">return</span> <span class="n">concat_data</span><span class="p">([</span><span class="n">X_odd</span><span class="p">,</span><span class="n">X_even</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="average_flexi_session">
+<a class="viewcode-back" href="../../../autoapi/zpyhelper/MVPA/preprocessors/index.html#zpyhelper.MVPA.preprocessors.average_flexi_session">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">average_flexi_session</span><span class="p">(</span><span class="n">activitypatternmatrix</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">session</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">average_by</span><span class="p">:</span><span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;average data in by flexible session separately</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    activitypatternmatrix : numpy.ndarray</span>
+<span class="sd">        data matrix of shape `(nsample,nvoxel)`</span>
+<span class="sd">    session : numpy.ndarray</span>
+<span class="sd">        array specifying the which session each row of data belongs to.</span>
+<span class="sd">    average_by : list</span>
+<span class="sd">        list specifying groups of sessions that will be averaged across. \n</span>
+<span class="sd">        For example, `average_by = [[0,1],[2,3]]` will return the average activity pattern of session 0 and 1, and the average activity pattern of session 2 and 3</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    numpy.ndarray</span>
+<span class="sd">        transformed data matrix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">activitypatternmatrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">session</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">X_list</span><span class="p">,</span><span class="n">unique_sess</span>  <span class="o">=</span> <span class="n">split_data</span><span class="p">(</span><span class="n">activitypatternmatrix</span><span class="p">,</span><span class="n">session</span><span class="p">,</span><span class="n">return_groups</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">unique_sess</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">unique_sess</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="n">s</span> <span class="ow">in</span> <span class="n">unique_sess</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">sum</span><span class="p">(</span><span class="n">average_by</span><span class="p">,[])]),</span> <span class="s2">&quot;some of the specified session do not exist!&quot;</span>
+    <span class="n">X_aves</span> <span class="o">=</span> <span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">X_list</span><span class="p">[</span><span class="n">unique_sess</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">s</span><span class="p">)]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">ss</span><span class="p">],</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="n">average_by</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">concat_data</span><span class="p">(</span><span class="n">X_aves</span><span class="p">)</span></div>
+
+
+<span class="c1">####################### Multivariate-Noise-Normalisation Methods #######################</span>
 <div class="viewcode-block" id="_estimate_whitening_from_resid">
-<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.preprocessors.html#zpyhelper.MVPA.preprocessors._estimate_whitening_from_resid">[docs]</a>
-<span class="k">def</span> <span class="nf">_estimate_whitening_from_resid</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../autoapi/zpyhelper/MVPA/preprocessors/index.html#zpyhelper.MVPA.preprocessors._estimate_whitening_from_resid">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">_estimate_whitening_from_resid</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;estimate a whitening matrix from a residual matrix with Oracle Approximating Shrinkage method</span>
+<span class="sd">    similar to the implementation@https://osf.io/dzqs2</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -119,74 +233,15 @@
 <span class="sd">        whitening matrix of size ``(nfeature,nfeature)``</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">res</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
-    <span class="n">shrunk_cov</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">_oas</span><span class="p">(</span><span class="n">res</span><span class="o">-</span><span class="n">res</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> 
+    <span class="n">shrunk_cov</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">_oas</span><span class="p">(</span><span class="n">res</span><span class="o">-</span><span class="n">res</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span><span class="n">assume_centered</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> 
     <span class="n">D</span><span class="p">,</span> <span class="n">V</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span><span class="p">(</span><span class="n">shrunk_cov</span><span class="p">)</span>
     <span class="n">preci_sqrt</span> <span class="o">=</span> <span class="p">(</span><span class="n">V</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">D</span><span class="p">)))</span> <span class="o">@</span> <span class="n">V</span><span class="o">.</span><span class="n">T</span> 
     <span class="k">return</span> <span class="n">preci_sqrt</span>    </div>
 
 
-<div class="viewcode-block" id="split_data">
-<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.preprocessors.html#zpyhelper.MVPA.preprocessors.split_data">[docs]</a>
-<span class="k">def</span> <span class="nf">split_data</span><span class="p">(</span><span class="n">X</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">groups</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">return_groups</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">select_groups</span><span class="p">:</span><span class="nb">list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span><span class="nb">tuple</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;split data into groups</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    X : numpy.ndarray</span>
-<span class="sd">        data to be split</span>
-<span class="sd">    groups : array, optional</span>
-<span class="sd">        array specifying the which group each row of data belongs to, if `None`, all rows are assumed to be from the same group. by default None</span>
-<span class="sd">    return_groups: bool, optional</span>
-<span class="sd">        whether or not to return the group corresponding to the split</span>
-<span class="sd">    select_groups:list, optional</span>
-<span class="sd">        the (subset of) groups used to return. If `None`, will return the splits corresponding to all groups. If a list, will only return the splits corresponding to the specified groups</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    list or tuple</span>
-<span class="sd">        data list or tuple of (data list, unique group) if `return_groups` is ``True``</span>
-<span class="sd">        Each element of data list is the data of one group.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">X</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">X</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Expected X to be 2D, but got </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">ndim</span><span class="si">}</span><span class="s2"> instead&quot;</span>
-    <span class="n">groups</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],))</span> <span class="k">if</span> <span class="n">groups</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">numpy</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">groups</span><span class="o">.</span><span class="n">size</span><span class="o">==</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;number of samples in X and groups does not match&quot;</span>
-    <span class="n">unique_groups</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span>
-    
-    <span class="n">select_groups</span> <span class="o">=</span> <span class="n">unique_groups</span> <span class="k">if</span> <span class="n">select_groups</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">select_groups</span>
-    <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="n">g</span> <span class="ow">in</span> <span class="n">unique_groups</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">select_groups</span><span class="p">]),</span> <span class="s2">&quot;some of the specified groups do not exist!&quot;</span>
-
-    <span class="k">if</span> <span class="n">return_groups</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">X</span><span class="p">[</span><span class="n">groups</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">==</span><span class="n">j</span><span class="p">,:]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">select_groups</span><span class="p">],</span> <span class="n">select_groups</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">X</span><span class="p">[</span><span class="n">groups</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">==</span><span class="n">j</span><span class="p">,:]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">select_groups</span><span class="p">]</span>   </div>
-
-
-<div class="viewcode-block" id="concat_data">
-<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.preprocessors.html#zpyhelper.MVPA.preprocessors.concat_data">[docs]</a>
-<span class="k">def</span> <span class="nf">concat_data</span><span class="p">(</span><span class="n">Xlist</span><span class="p">:</span><span class="nb">list</span><span class="p">)</span><span class="o">-&gt;</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;concatenate list of data array into one array</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    Xlist : list</span>
-<span class="sd">        list of data array, all of which must have same number of columns</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    numpy.ndarray</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">Xlist</span> <span class="o">=</span> <span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="k">for</span> <span class="n">X</span> <span class="ow">in</span> <span class="n">Xlist</span> <span class="k">if</span> <span class="nb">all</span><span class="p">([</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">ndim</span><span class="o">==</span><span class="mi">2</span><span class="p">,</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">])]</span>
-    <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">Xlist</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
-
-
-
-
-
-
 <div class="viewcode-block" id="normalise_multivariate_noise">
-<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.preprocessors.html#zpyhelper.MVPA.preprocessors.normalise_multivariate_noise">[docs]</a>
-<span class="k">def</span> <span class="nf">normalise_multivariate_noise</span><span class="p">(</span><span class="n">activitypatternmatrix</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+<a class="viewcode-back" href="../../../autoapi/zpyhelper/MVPA/preprocessors/index.html#zpyhelper.MVPA.preprocessors.normalise_multivariate_noise">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">normalise_multivariate_noise</span><span class="p">(</span><span class="n">activitypatternmatrix</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
                                  <span class="n">residualmatrix</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
                                  <span class="n">ap_groups</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                                  <span class="n">resid_groups</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -195,6 +250,7 @@
 <span class="sd">    The activity pattern matrix and residual matrix is first split into groups. \n</span>
 <span class="sd">    For each group of data, a whitening matrix is estimated from the residual matrix and then applied to the acitvity pattern matrix. \n</span>
 <span class="sd">    Splits are then concatenated back to the original shape.</span>
+<span class="sd">    similar to the implementation@https://osf.io/3k759</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -227,9 +283,10 @@
     <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">X_whiten</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
 
 
+<span class="c1">####################### Dimensionality Reduction Methods #######################</span>
 <div class="viewcode-block" id="extract_pc">
-<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.preprocessors.html#zpyhelper.MVPA.preprocessors.extract_pc">[docs]</a>
-<span class="k">def</span> <span class="nf">extract_pc</span><span class="p">(</span><span class="n">activitypatternmatrix</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">n_components</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../autoapi/zpyhelper/MVPA/preprocessors/index.html#zpyhelper.MVPA.preprocessors.extract_pc">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_pc</span><span class="p">(</span><span class="n">activitypatternmatrix</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">n_components</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform PCA and transform the data accordingly</span>
 
 <span class="sd">    Parameters</span>
@@ -253,62 +310,84 @@
         <span class="k">return</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">n_components</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">activitypatternmatrix</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="average_odd_even_session">
-<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.preprocessors.html#zpyhelper.MVPA.preprocessors.average_odd_even_session">[docs]</a>
-<span class="k">def</span> <span class="nf">average_odd_even_session</span><span class="p">(</span><span class="n">activitypatternmatrix</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">session</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;average data in odd and even session separately</span>
+
+<span class="c1">########################### Alignment Methods ###########################</span>
+<div class="viewcode-block" id="rmsd">
+<a class="viewcode-back" href="../../../autoapi/zpyhelper/MVPA/preprocessors/index.html#zpyhelper.MVPA.preprocessors.rmsd">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">rmsd</span><span class="p">(</span><span class="n">X</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">Y</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the root mean square deviation between two matrices</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    activitypatternmatrix : numpy.ndarray</span>
-<span class="sd">        data matrix of shape `(nsample,nvoxel)`</span>
-<span class="sd">    session : numpy.ndarray</span>
-<span class="sd">        array specifying the which session each row of data belongs to.</span>
-
+<span class="sd">    X : numpy.ndarray</span>
+<span class="sd">        Matrix 1</span>
+<span class="sd">    Y : numpy.ndarray</span>
+<span class="sd">        Matrix 2</span>
+<span class="sd">    </span>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    numpy.ndarray</span>
-<span class="sd">        transformed data matrix</span>
+<span class="sd">    float</span>
+<span class="sd">        Root mean square deviation between X and Y</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">assert</span> <span class="n">activitypatternmatrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">session</span><span class="o">.</span><span class="n">size</span>
-    <span class="n">X_list</span>  <span class="o">=</span> <span class="n">split_data</span><span class="p">(</span><span class="n">activitypatternmatrix</span><span class="p">,</span><span class="n">session</span><span class="p">)</span>
-    <span class="n">X_odd</span>   <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">X_list</span><span class="p">[</span><span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">],</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="n">X_even</span>  <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">X_list</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">],</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_list</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">1</span> <span class="k">else</span> <span class="p">[]</span>
-    <span class="k">return</span> <span class="n">concat_data</span><span class="p">([</span><span class="n">X_odd</span><span class="p">,</span><span class="n">X_even</span><span class="p">])</span></div>
+    <span class="k">assert</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">Y</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="s2">&quot;Matrix dimensions must match&quot;</span>
+    <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span> <span class="p">(</span><span class="n">X</span><span class="o">-</span><span class="n">Y</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="p">)</span> <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="average_flexi_session">
-<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.preprocessors.html#zpyhelper.MVPA.preprocessors.average_flexi_session">[docs]</a>
-<span class="k">def</span> <span class="nf">average_flexi_session</span><span class="p">(</span><span class="n">activitypatternmatrix</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">session</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">average_by</span><span class="p">:</span><span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;average data in by flexible session separately</span>
+<div class="viewcode-block" id="kabsch_algorithm">
+<a class="viewcode-back" href="../../../autoapi/zpyhelper/MVPA/preprocessors/index.html#zpyhelper.MVPA.preprocessors.kabsch_algorithm">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">kabsch_algorithm</span><span class="p">(</span><span class="n">P</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span><span class="n">Q</span><span class="p">:</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">translation</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">-&gt;</span><span class="nb">tuple</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;use Kabsch algorithm to compute the optimal rotation matrix that aligns P to Q.   \n</span>
+<span class="sd">    P and Q are NxK matrices where K is the dimensionality and N is the number of points.</span>
+<span class="sd">    Reference: https://github.com/charnley/rmsd/blob/master/rmsd/calculate_rmsd.py</span>
 
+<span class="sd">    The algorithm is based on the following steps: \n</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    activitypatternmatrix : numpy.ndarray</span>
-<span class="sd">        data matrix of shape `(nsample,nvoxel)`</span>
-<span class="sd">    session : numpy.ndarray</span>
-<span class="sd">        array specifying the which session each row of data belongs to.</span>
-<span class="sd">    average_by : list</span>
-<span class="sd">        list specifying groups of sessions that will be averaged across. \n</span>
-<span class="sd">        For example, `average_by = [[0,1],[2,3]]` will return the average activity pattern of session 0 and 1, and the average activity pattern of session 2 and 3</span>
+<span class="sd">    P : numpy.ndarray</span>
+<span class="sd">        source matrix that needed to be aligned to Q</span>
+<span class="sd">    Q : numpy.ndarray</span>
+<span class="sd">        reference matrix that P will be aligned to</span>
+<span class="sd">    translation : bool, optional</span>
+<span class="sd">        if True, will use centroids to translate P and Q onto each other, by default False</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    numpy.ndarray</span>
-<span class="sd">        transformed data matrix</span>
+<span class="sd">    a tuple of (Phat, R, rmsd)\n</span>
+<span class="sd">        Phat is the rotated P. \n</span>
+<span class="sd">        R is the estimated rotation matrix\n</span>
+<span class="sd">        The rmsd between the rotated P and Q \n</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">assert</span> <span class="n">activitypatternmatrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">session</span><span class="o">.</span><span class="n">size</span>
-    <span class="n">X_list</span><span class="p">,</span><span class="n">unique_sess</span>  <span class="o">=</span> <span class="n">split_data</span><span class="p">(</span><span class="n">activitypatternmatrix</span><span class="p">,</span><span class="n">session</span><span class="p">,</span><span class="n">return_groups</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">unique_sess</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">unique_sess</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="nb">all</span><span class="p">([</span><span class="n">s</span> <span class="ow">in</span> <span class="n">unique_sess</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">sum</span><span class="p">(</span><span class="n">average_by</span><span class="p">,[])]),</span> <span class="s2">&quot;some of the specified session do not exist!&quot;</span>
-    <span class="n">X_aves</span> <span class="o">=</span> <span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">X_list</span><span class="p">[</span><span class="n">unique_sess</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">s</span><span class="p">)]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">ss</span><span class="p">],</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="n">average_by</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">concat_data</span><span class="p">(</span><span class="n">X_aves</span><span class="p">)</span></div>
+
+    <span class="c1">#check the dimensionality of the input matrices</span>
+    <span class="k">assert</span> <span class="n">P</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">Q</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="s2">&quot;Matrix dimensions must match&quot;</span>
+    
+    <span class="k">if</span> <span class="n">translation</span><span class="p">:</span>
+        <span class="n">P</span> <span class="o">=</span> <span class="n">P</span> <span class="o">-</span> <span class="n">P</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">Q</span> <span class="o">=</span> <span class="n">Q</span> <span class="o">-</span> <span class="n">Q</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    
+    <span class="c1">#compute the covariance matrix</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">P</span><span class="o">.</span><span class="n">T</span><span class="p">,</span><span class="n">Q</span><span class="p">)</span>
+
+    <span class="c1"># SVD on the covariance matrix</span>
+    <span class="n">U</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">Vt</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>
+
+    <span class="c1"># Validate right-handed coordinate system</span>
+    <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">U</span><span class="p">)</span><span class="o">*</span><span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">Vt</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="n">U</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">U</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># Optimal rotation</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">Vt</span><span class="p">)</span>
+    <span class="n">Phat</span> <span class="o">=</span> <span class="n">P</span><span class="nd">@R</span> <span class="c1">#np.dot(P,R)+centroid_Q-centroid_P</span>
+
+    <span class="k">return</span> <span class="n">Phat</span><span class="p">,</span> <span class="n">R</span><span class="p">,</span> <span class="n">rmsd</span><span class="p">(</span><span class="n">Phat</span><span class="p">,</span><span class="n">Q</span><span class="p">)</span></div>
 
 
-
+<span class="c1">########################### Chaining Functions ###########################</span>
 <div class="viewcode-block" id="chain_steps">
-<a class="viewcode-back" href="../../../api/zpyhelper.MVPA.preprocessors.html#zpyhelper.MVPA.preprocessors.chain_steps">[docs]</a>
-<span class="k">def</span> <span class="nf">chain_steps</span><span class="p">(</span><span class="o">*</span><span class="n">varargin</span><span class="p">):</span>
+<a class="viewcode-back" href="../../../autoapi/zpyhelper/MVPA/preprocessors/index.html#zpyhelper.MVPA.preprocessors.chain_steps">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">chain_steps</span><span class="p">(</span><span class="o">*</span><span class="n">varargin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Chaining different preprocessing functions together and compose it into one preprocessing function. \n</span>
 <span class="sd">    parameters for different preprocessing steps will also be set. \n</span>
 <span class="sd">    The composed function will only take the activity pattern matrix as input.\n</span>
@@ -362,7 +441,7 @@
           
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
         <div class="sphinxsidebarwrapper">
 <h1 class="logo"><a href="../../../index.html">zpyhelper</a></h1>
 
@@ -373,9 +452,19 @@
 
 
 
-<h3>Navigation</h3>
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../_autosummary/zpyhelper.html">zpyhelper</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../autoapi/index.html">API Reference</a></li>
 </ul>
 
 <div class="relations">
@@ -387,16 +476,6 @@
   </ul></li>
 </ul>
 </div>
-<search id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
-    <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-      <input type="submit" value="Go" />
-    </form>
-    </div>
-</search>
-<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -413,8 +492,8 @@
       &#169;2024, Zilu Liang.
       
       |
-      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
-      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
       
     </div>
 

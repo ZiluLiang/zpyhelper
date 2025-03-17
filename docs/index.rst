@@ -7,7 +7,7 @@ Welcome to zpyhelper's documentation!
 =====================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
    :hidden:
    :caption: Contents:
 

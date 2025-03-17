@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>zpyhelper.image.niidatahandler &#8212; zpyhelper  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/alabaster.css?v=27fed22d" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+    <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="zpyhelper.image.searchlight" href="../searchlight/index.html" />
+    <link rel="prev" title="zpyhelper.image" href="../index.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-zpyhelper.image.niidatahandler">
+<span id="zpyhelper-image-niidatahandler"></span><h1>zpyhelper.image.niidatahandler<a class="headerlink" href="#module-zpyhelper.image.niidatahandler" title="Link to this heading">¶</a></h1>
+<p>Methods for loading data from nii image and writing data to image</p>
+<p>Zilu Liang &#64;HIPlab Oxford
+2023</p>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#zpyhelper.image.niidatahandler._check_single_image" title="zpyhelper.image.niidatahandler._check_single_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_check_single_image</span></code></a>(image)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#zpyhelper.image.niidatahandler._check_and_load_images" title="zpyhelper.image.niidatahandler._check_and_load_images"><code class="xref py py-obj docutils literal notranslate"><span class="pre">_check_and_load_images</span></code></a>(imgs[, mode, intersect_threshold])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#zpyhelper.image.niidatahandler.write_data_to_image" title="zpyhelper.image.niidatahandler.write_data_to_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">write_data_to_image</span></code></a>(data, mask_imgs[, ref_img, ...])</p></td>
+<td><p>create a nibabel image object to store data</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#zpyhelper.image.niidatahandler.retrieve_data_from_image" title="zpyhelper.image.niidatahandler.retrieve_data_from_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">retrieve_data_from_image</span></code></a>(data_nii_paths[, mask_imgs, ...])</p></td>
+<td><p>retrieve data from nii images</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="zpyhelper.image.niidatahandler._check_single_image">
+<span class="sig-prename descclassname"><span class="pre">zpyhelper.image.niidatahandler.</span></span><span class="sig-name descname"><span class="pre">_check_single_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zpyhelper/image/niidatahandler.html#_check_single_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.image.niidatahandler._check_single_image" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="zpyhelper.image.niidatahandler._check_and_load_images">
+<span class="sig-prename descclassname"><span class="pre">zpyhelper.image.niidatahandler.</span></span><span class="sig-name descname"><span class="pre">_check_and_load_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imgs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'pass'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intersect_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zpyhelper/image/niidatahandler.html#_check_and_load_images"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.image.niidatahandler._check_and_load_images" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="zpyhelper.image.niidatahandler.write_data_to_image">
+<span class="sig-prename descclassname"><span class="pre">zpyhelper.image.niidatahandler.</span></span><span class="sig-name descname"><span class="pre">write_data_to_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_imgs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ensure_finite</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputpath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zpyhelper/image/niidatahandler.html#write_data_to_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.image.niidatahandler.write_data_to_image" title="Link to this definition">¶</a></dt>
+<dd><p>create a nibabel image object to store data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>numpy.ndarray</em>) – a 1d or 2d data array to be saved in nii image.
+If data only has one dimension, a 3D image will be created. data array must contain same number of data points as the number of masked voxels.
+If data has two dimensions, a 4D image will be created. The columns of data will be mapped onto masked voxels, and each row specifies one volume of the 4D image.</p></li>
+<li><p><strong>mask_imgs</strong> (<em>str or list, optional</em>) – path or a list of (paths to) mask image(s). Data will be written to the voxels in the masks.
+If <code class="docutils literal notranslate"><span class="pre">None</span></code>, data from all voxels in the 4D nii image will be loaded, by default <code class="docutils literal notranslate"><span class="pre">None</span></code>
+If a single mask is provided,  only voxels in mask will be included
+If a list of masks is provided,  only voxels lying at the intersection of the masks will be included</p></li>
+<li><p><strong>ref_img</strong> (<em>Niimg-like object</em>) – Reference image. The new image will be of the same type. If <cite>None</cite>, will use the mask image as reference image.</p></li>
+<li><p><strong>ensure_finite</strong> (<em>bool, optional</em>) – whether or not to replace nans. If <code class="docutils literal notranslate"><span class="pre">True</span></code>, nans will be saved as zero. If <code class="docutils literal notranslate"><span class="pre">False</span></code>, will keep as nan. by default <code class="docutils literal notranslate"><span class="pre">False</span></code></p></li>
+<li><p><strong>outputpath</strong> (<em>bool, optional</em>) – the path to save image, if <code class="docutils literal notranslate"><span class="pre">None</span></code>, image will not be saved. by default <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>data_3D_list</em> – list containing data reshaped into same dimension as the mask</p></li>
+<li><p><em>img</em> – 4D or 3D nibabel image</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="zpyhelper.image.niidatahandler.retrieve_data_from_image">
+<span class="sig-prename descclassname"><span class="pre">zpyhelper.image.niidatahandler.</span></span><span class="sig-name descname"><span class="pre">retrieve_data_from_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_nii_paths</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_imgs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">returnmask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../../_modules/zpyhelper/image/niidatahandler.html#retrieve_data_from_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#zpyhelper.image.niidatahandler.retrieve_data_from_image" title="Link to this definition">¶</a></dt>
+<dd><p>retrieve data from nii images</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data_nii_paths</strong> (<em>str or list</em>) – path or a list of paths to nii file containing the data to be loaded. If a list of paths is provided, nii files will be concatenated along the 3rd dimension (as 4D nii files)</p></li>
+<li><p><strong>mask_imgs</strong> (<em>str or list, optional</em>) – path or a list of paths to mask image(s).
+If <code class="docutils literal notranslate"><span class="pre">None</span></code>, data from all voxels in the 4D nii image will be loaded, by default <code class="docutils literal notranslate"><span class="pre">None</span></code>
+If a single mask is provided,  only voxels in mask will be included
+If a list of masks is provided,  only voxels lying at the intersection of the masks will be included</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>LookupError</strong> – if any of the nii image files are not found, will throw error</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../../index.html">zpyhelper</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../../_autosummary/zpyhelper.html">zpyhelper</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../index.html">zpyhelper</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../../MVPA/index.html">zpyhelper.MVPA</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../filesys/index.html">zpyhelper.filesys</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="../index.html">zpyhelper.image</a><ul class="current">
+<li class="toctree-l5 current"><a class="reference internal" href="../index.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l6 current"><a class="current reference internal" href="#">zpyhelper.image.niidatahandler</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#functions">Functions</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li class="toctree-l8"><a class="reference internal" href="#zpyhelper.image.niidatahandler._check_single_image"><code class="docutils literal notranslate"><span class="pre">_check_single_image()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#zpyhelper.image.niidatahandler._check_and_load_images"><code class="docutils literal notranslate"><span class="pre">_check_and_load_images()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#zpyhelper.image.niidatahandler.write_data_to_image"><code class="docutils literal notranslate"><span class="pre">write_data_to_image()</span></code></a></li>
+<li class="toctree-l8"><a class="reference internal" href="#zpyhelper.image.niidatahandler.retrieve_data_from_image"><code class="docutils literal notranslate"><span class="pre">retrieve_data_from_image()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l6"><a class="reference internal" href="../searchlight/index.html">zpyhelper.image.searchlight</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">API Reference</a><ul>
+  <li><a href="../../index.html">zpyhelper</a><ul>
+  <li><a href="../index.html">zpyhelper.image</a><ul>
+      <li>Previous: <a href="../index.html" title="previous chapter">zpyhelper.image</a></li>
+      <li>Next: <a href="../searchlight/index.html" title="next chapter">zpyhelper.image.searchlight</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, Zilu Liang.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.2.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../../../../_sources/autoapi/zpyhelper/image/niidatahandler/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

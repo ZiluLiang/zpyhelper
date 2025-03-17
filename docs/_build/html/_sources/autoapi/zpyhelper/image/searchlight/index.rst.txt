@@ -1,0 +1,291 @@
+zpyhelper.image.searchlight
+===========================
+
+.. py:module:: zpyhelper.image.searchlight
+
+.. autoapi-nested-parse::
+
+   This module contains classes for running searchlight MVPA analysis in nifti images.
+   The code is adapted from nilearn.decoding.searchlight module @ https://github.com/nilearn/nilearn/blob/321494420/nilearn/decoding/searchlight.py
+
+   ..
+       !! processed by numpydoc !!
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   zpyhelper.image.searchlight.MVPASearchLight
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   zpyhelper.image.searchlight._apply_mask_and_get_affinity
+
+
+Module Contents
+---------------
+
+.. py:function:: _apply_mask_and_get_affinity(seeds, niimgs, radius: float = 5, mask_img=None, empty_policy: str = 'ignore', n_vox: int = 2, allow_overlap: bool = True, n_jobs: int = cpu_count())
+
+   
+   This function is adapted from `_apply_mask_and_get_affinity` from the `nilearn.maskers.nifti_spheres_masker` module
+   (https://github.com/nilearn/nilearn/blob/0d379462d8f84344056308d4d096caf78954ca6d/nilearn/input_data/nifti_spheres_masker.py)
+
+   .. rubric:: Original Documentation
+
+   Get only the rows which are occupied by sphere at given seed locations and the provided radius.
+   Rows are in target_affine and target_shape space.
+
+   .. rubric:: Adaptation
+
+   This function is adapted to:
+
+   1. impose minimum voxel number contraints and avoid throwing warnings when an empty sphere/insufficient voxel number is detected.
+   The current script handle empty sphere or sphere with insufficient voxel number using one of the three approaches by specifying `empty_policy` argument:
+       - ``'fill'``: conduct new search with the same algorithm but incrementing searchlight sphere radius for empty spheres
+       - ``'ignore'``: return empty
+       - ``'raise'``: throw an error
+
+   2. add parallelization to speed up the process
+
+   3. extract from multiple nii img. This will be handy when estimating whitening matrix for each sphere from residual images of the first level GLM.
+
+   :Parameters: * **seeds** (*List of triplets of coordinates in native space*) -- Seed definitions. List of coordinates of the seeds in the same space
+                  as target_affine.
+                * **niimgs** (*a list of or one 3D/4D Niimg-like object*) -- See :ref:`extracting_data`.
+                  Images to process.
+                  If a 3D niimg is provided, a singleton dimension will be added to
+                  the output to represent the single scan in the niimg.
+                * **radius** (*float*) -- Indicates, in millimeters, the radius for the sphere around the seed.  By default `5`.
+                * **mask_img** (*Niimg-like object, optional*) -- Mask to apply to regions before extracting signals. If niimg is None,
+                  mask_img is used as a reference space in which the spheres 'indices are
+                  placed. By default `None`.
+                * **empty_policy** (*str, optional*) -- how to deal with empty spheres
+                * **n_vox** (*int, optional*) -- minimum number of voxels in each searchlight sphere. By default `2`.
+                * **allow_overlap** (*boolean*) -- If False, a ValueError is raised if VOIs overlap. By default `True`.
+
+   :returns: * **X** (*2D numpy.ndarray*) -- Signal for each brain voxel in the (masked) niimgs.
+               shape: (number of scans, number of voxels)
+             * **A** (*scipy.sparse.lil_matrix*) -- Contains the boolean indices for each sphere.
+               shape: (number of seeds, number of voxels)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:class:: MVPASearchLight(patternimg_paths, mask_img_path: str, residimg_paths: list = [], process_mask_img_path: str = None, radius: float = 12.5, preproc_steps: dict = {}, njobs: int = 1)
+
+   
+   Class for running searchlight analysis. Once instantiated, can be used to run multiple searchlight analyses.
+
+   .. rubric:: Example
+
+   For example, the following code instantiates a searchlight instance, and then runs a regression searchlight and then a decoding searchlight.
+   ```
+   SearchLight = MVPASearchLight(patternimg_paths, mask_img_path, residimg_paths, process_mask_img_path, radius, preproc_steps, njobs)
+   subSearchLight.run(estimator = MultipleRDMRegression, estimator_kwargs = regression_kwargs, outputpath = somepath,  outputregexp = 'beta_%04d.nii')
+   subSearchLight.run(estimator = PatternDecoding, estimator_kwargs = decoding_kwargs, outputpath = somepath,  outputregexp = 'acc_%04d.nii')
+   ```
+
+   :Parameters: * **patternimg_paths** (*str or list*) -- path to the activity pattern images. It can be path to a 4D image or paths to multiple 3D images.
+                * **mask_img_path** (*str*) -- path to the mask image. The mask image is a boolean image specifying voxels whose signals should be included into computation (of neural rdm etc)
+                * **residimg_paths** (*str or list*) -- path to the residual images. It can be path to a 4D image or paths to multiple 3D images. It will be used if multivariate noise normalization is required
+                * **process_mask_img_path** (*str, optional*) -- path to the process mask image. The process mask image is a boolean image specifying voxels on which searchlight analysis is performed. If None, will use the mask_img_path by default None
+                * **radius** (*float, optional*) -- the radius of the searchlight sphere, by default 12.5
+                * **preproc_steps** (*dict, optional*) -- preprocesss steps applied to the activity pattern matrix before calling estimator
+
+                  for example:
+
+                  ```
+                  preproc_steps = {
+                      "MVNN": [normalise_multivariate_noise,
+                                  {"ap_groups":apgroup,"resid_groups":rsgroup}
+                              ],
+                      "PCA": [extract_pc,{"n_components":3}],
+                      "AOE": [average_odd_even_session,{"session":session}],
+                      }
+                  ```
+                * **njobs** (*int, optional*) -- number of parallel jobs, by default 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+   .. py:attribute:: pattern_img
+
+
+   .. py:attribute:: mask_img
+
+
+   .. py:attribute:: process_mask_img
+
+
+   .. py:attribute:: radius
+      :value: 12.5
+
+
+
+   .. py:attribute:: njobs
+      :value: 1
+
+
+
+   .. py:attribute:: preproc_steps
+
+
+   .. py:attribute:: config
+
+
+   .. py:method:: run(estimator, estimator_kwargs: dict, outputpath: str, outputregexp: str = 'beta_%04d.nii', verbose: bool = True)
+
+      
+      run searchlight analysis and save results.
+
+      Whole brain searchlight spheres are split into `self.jobs` number of chunks and the searchlight for these chunks are performed in parallel.
+
+      In each searchlight sphere, its neural activity pattern as well as the `estimator_kwargs` are passed to `estimator` to instantiate an estimator class for running the analysis
+
+      After all jobs are done, results are written into a nii file and saved to the output directory
+
+      :Parameters: * **estimator** (*class*) -- an estimator class that is called to perform rsa analysis in each sphere
+                   * **estimator_kwargs** (*dict*) -- other arguments passed to instantiate an estimator class in each sphere
+                   * **outputpath** (*str*) -- output directory, results will be written to a nii file and saved to this directory
+                   * **outputregexp** (*str*) -- regular expression that is used to contruct output nii file name.  by default "beta_%04d.nii"
+                   * **verbose** (*bool, optional*) -- display progress or not, by default True
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: write(result: numpy.ndarray, estimator_details: str, outputpath: str, outputregexp: str, ensure_finite: bool = False)
+
+      
+      write result to nii file
+
+      :Parameters: * **result** (*numpy.ndarray*) -- result to write
+                   * **estimator_details** (*str*) -- description of estimator details
+                   * **outputpath** (*str*) -- directory to save the nii file
+                   * **outputregexp** (*str*) -- regular expression used to name the nii file
+                   * **ensure_finite** (*bool, optional*) -- whether or not to replace nans. If `True`, nans will be saved as zero. If `False`, will keep as nan. by default False, by default False
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: fitPatchGroup(neighbour_idx_list: list, thread_id: int, total: int, estimator_kwargs: dict, verbose: bool = True)
+
+      
+      run analysis in a group of searchlight patches
+
+      :Parameters: * **neighbour_idx_list** (*list*) -- a list of indices of voxels that should be included in each searchlight sphere
+                   * **thread_id** (*int*) -- thread id for the current job, used for display
+                   * **total** (*int*) -- total number of voxels to perform searchlight on across all jobs
+                   * **estimator_kwargs** (*dict*) -- _other arguments passed to instantiate an estimator class in each sphere
+                   * **verbose** (*bool, optional*) -- display progress or not, by default True
+
+      :returns: * **result** (*numpy.array*) -- searchlight results for the list of voxels
+                * **estimator_details** (*dict*) -- details of estimator returned by the estimator class. values in the dictionary should be serialized and ready to be written in to json format.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+
+   .. py:method:: genPatches()
+
+      
+      generate "patches" of searchlight:
+
+      extract wholebrain activity pattern matrix and find indices of voxels that should be included in each searchlight sphere
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ..
+          !! processed by numpydoc !!
+
+

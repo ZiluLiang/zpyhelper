@@ -1,0 +1,41 @@
+zpyhelper
+=========
+
+.. py:module:: zpyhelper
+
+.. autoapi-nested-parse::
+
+   
+   zpyhelper.
+
+   local python library for helper functions for MVPA analysis.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/zpyhelper/MVPA/index
+   /autoapi/zpyhelper/filesys/index
+   /autoapi/zpyhelper/image/index
+
+

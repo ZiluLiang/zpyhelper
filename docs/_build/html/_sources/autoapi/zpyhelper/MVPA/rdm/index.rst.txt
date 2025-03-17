@@ -1,0 +1,289 @@
+zpyhelper.MVPA.rdm
+==================
+
+.. py:module:: zpyhelper.MVPA.rdm
+
+.. autoapi-nested-parse::
+
+   This module contains helper function for computing representation (dis)similarity matrix
+
+   Zilu Liang @HIPlab Oxford
+   2024
+
+   ..
+       !! processed by numpydoc !!
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   zpyhelper.MVPA.rdm.check_array
+   zpyhelper.MVPA.rdm.lower_tri
+   zpyhelper.MVPA.rdm.upper_tri
+   zpyhelper.MVPA.rdm.compute_R2
+   zpyhelper.MVPA.rdm.compute_rdm
+   zpyhelper.MVPA.rdm.nan_equal
+   zpyhelper.MVPA.rdm.compute_rdm_identity
+   zpyhelper.MVPA.rdm.compute_rdm_nomial
+   zpyhelper.MVPA.rdm.compute_rdm_residual
+
+
+Module Contents
+---------------
+
+.. py:function:: check_array(x, ensure_dim: int = 2, min_sample=1, min_feature=1) -> numpy.ndarray
+
+   
+   check if the dimensionality of array satisfies criteria
+
+   :Parameters: * **x** (*object*) -- the object to be transformed in to numpy.ndarray
+                * **ensure_dim** (*int*) -- ensure dimensionality of the transformed array, by default ``1``
+                * **min_sample** (*int, optional*) -- minimum number of samples (length of the first axis), by default ``1``
+                * **min_feature** (*int, optional*) -- minimum number of features (length of the second axis), only matters if ``ensure_dim==2``, by default ``1``
+
+   :returns: *numpy.ndarray*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: lower_tri(rdm: numpy.ndarray) -> tuple
+
+   
+   return the lower triangular part of the RDM, excluding the diagonal elements
+
+   :Parameters: **rdm** (*numpy.ndarray*) -- the representation dissimilarity matrix of size ``(nsample,nsample)``
+
+   :returns: **tuple** (*(rdm_tril,lower_tril_idx)*) -- rdm_tril: the lower triangular part of the RDM, excluding the diagonal elements
+             lower_tril_idx: the index of the lower triangular part of the RDM, excluding the diagonal elements
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: upper_tri(rdm: numpy.ndarray) -> tuple
+
+   
+   return the upper triangular part of the RDM, excluding the diagonal elements
+
+   :Parameters: **rdm** (*numpy.ndarray*) -- the representation dissimilarity matrix. of size ``(nsample,nsample)``
+
+   :returns: **tuple** (*(rdm_tril,upper_tril_idx)*) -- rdm_tril: a 1D numpy array. the upper triangular part of the RDM, excluding the diagonal elements
+             upper_tril_idx: a 1D numpy array. the index of the upper triangular part of the RDM, excluding the diagonal elements
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: compute_R2(y_pred: numpy.ndarray, y_true: numpy.ndarray, nparam: int) -> tuple
+
+   
+   compute the coefficient of determination (R-square or adjusted R-square) of a model based on prediction and true value
+   based on formula in https://en.wikipedia.org/wiki/Coefficient_of_determination
+
+   :Parameters: * **y_pred** (*numpy.ndarray*) -- 1D numpy array of predicted y values
+                * **y_true** (*numpy.ndarray*) -- 1D numpy array of true (observed) y values
+                * **nparam** (*int*) -- number of parameters in the model
+
+   :returns: *tuple* -- a tuple of (r-squared, adjusted r-squared)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: compute_rdm(pattern_matrix: numpy.ndarray, metric: str) -> numpy.ndarray
+
+   
+   compute the dissimilarity matrix of a nsample x nfeature matrix.
+
+   :Parameters: * **pattern_matrix** (*numpy.ndarray*) -- pattern_matrix containing samples' features, of size ``(nsample,nfeature)``
+                * **metric** (*str*) -- dissimilarity/distance metric passed to `scipy.spatial.distance.pdist`
+
+   :returns: *numpy.ndarray* -- dissimliarity matrix of size ``(nsample,nsample)``
+
+   :raises Exception: pattern matrix must be 2D with minimum of 2 samples and 1 feature
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: nan_equal(a: numpy.ndarray, b: numpy.ndarray) -> numpy.ndarray
+
+   
+   check element-wise if two numpy array are equal. nan value comparisons will result in nan. In the result array, boolean values are converted in to 1 and 0.
+
+   :Parameters: * **a** (*numpy.ndarray*) -- Input array
+                * **b** (*numpy.ndarray*) -- Input array
+
+   :returns: *numpy.ndarray* -- The result array from comparison, has the same shape as input arrays.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: compute_rdm_identity(pattern_matrix: numpy.ndarray) -> numpy.ndarray
+
+   
+   comput the dissimilarity matrix based on sample identity, if the pair have the same value, distance will be zero, otherwise will be one.
+   This is similar to the 'scipy.spatial.distance.hamming' except that nan values will return nan instead of included in distance computation.
+
+   :Parameters: **pattern_matrix** (*numpy.ndarray*) -- pattern_matrix containing samples' identity, of size ``(nsample,)``
+
+   :returns: *numpy.ndarray* -- dissimliarity matrix of size ``(nsample,nsample)``
+
+   :raises Exception: pattern matrix must be 1D with minimum of 2 samples
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: compute_rdm_nomial(pattern_matrix: numpy.ndarray) -> numpy.ndarray
+
+   
+   compute the dissimilarity matrix based on samples' nomial features. Must have at least 2 features, otherwise should use ``compute_rdm_identity`` instead.
+   This is similar to the 'scipy.spatial.distance.hamming' except that nan values will return nan instead of included in distance computation.
+
+   :Parameters: **pattern_matrix** (*numpy.ndarray*) -- pattern_matrix containing samples' features, of size ``(nsample,nfeature)``
+
+   :returns: *numpy.ndarray* -- dissimliarity matrix of size ``(nsample,nsample)``
+
+   :raises Exception: pattern matrix must be 2D with minimum of 2 samples and 2 features
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+
+.. py:function:: compute_rdm_residual(rdm: numpy.ndarray, control_rdms: Union[list, numpy.ndarray], squareform=True)
+
+   
+   compute the residual of rdm after explaining for control rdms
+
+   :Parameters: * **rdm** (*numpy.ndarray*) -- the target rdm
+                * **control_rdms** (*list or numpy.ndarray*) -- a control rdm or a list of control rdms
+                * **squareform** (*bool, optional*) -- to put residual back to square form or not, by default True
+
+   :returns: *numpy.ndarray* -- the residual rdm, if ``squareform==True``, the shape will be the same as the original rdm, otherwise, the lower triangular part will be returned
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   ..
+       !! processed by numpydoc !!
+

@@ -1,17 +1,8 @@
-zpyhelper.image.searchlight
+﻿zpyhelper.image.searchlight
 ===========================
 
 .. automodule:: zpyhelper.image.searchlight
 
-   
-   
-   
-
-   
-   
-   
-
-   
    
    .. rubric:: Classes
 
@@ -19,11 +10,3 @@ zpyhelper.image.searchlight
    
       MVPASearchLight
    
-   
-
-   
-   
-   
-
-
-
